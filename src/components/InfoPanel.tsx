@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import styles from './InfoPanel.module.css';
 
 interface Props {
@@ -6,7 +7,19 @@ interface Props {
 }
 
 export function InfoPanel({ open, onClose }: Props) {
+  const [confirmReset, setConfirmReset] = useState(false);
+
   if (!open) return null;
+
+  const handleReset = () => {
+    if (!confirmReset) {
+      setConfirmReset(true);
+      return;
+    }
+    localStorage.clear();
+    setConfirmReset(false);
+    window.location.reload();
+  };
 
   return (
     <div className={styles.overlay} onClick={onClose}>
@@ -73,6 +86,18 @@ export function InfoPanel({ open, onClose }: Props) {
             [momir.io project](https://momir.io) by Devin Cooper.
           </p>
           <span className={styles.badge}>v0.1.0</span>
+        </div>
+
+        <div className={styles.section}>
+          <button
+            className={confirmReset ? styles.resetBtnConfirm : styles.resetBtn}
+            onClick={handleReset}
+          >
+            {confirmReset ? 'Are you sure? This will reload the page.' : 'Reset all preferences'}
+          </button>
+          <p className={styles.text} style={{ fontSize: 12 }}>
+            Clears your starred cards, recent cards, preferred printings, and settings.
+          </p>
         </div>
       </div>
     </div>
