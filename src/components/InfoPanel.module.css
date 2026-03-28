@@ -1,0 +1,95 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.panel {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  padding: 24px 20px 28px;
+  width: 90%;
+  max-width: 400px;
+  max-height: 80dvh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 24px;
+  padding: 4px 8px;
+  line-height: 1;
+}
+
+.closeBtn:hover {
+  color: var(--text-primary);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sectionLabel {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+.text {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.linkList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.linkList li {
+  font-size: 14px;
+}
+
+.linkList a {
+  color: var(--accent-blue);
+  text-decoration: none;
+}
+
+.linkList a:hover {
+  text-decoration: underline;
+}
+
+.badge {
+  display: inline-block;
+  font-size: 12px;
+  color: var(--text-muted);
+  background: var(--bg-surface);
+  border-radius: var(--radius-sm);
+  padding: 2px 8px;
+}

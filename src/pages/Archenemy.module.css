@@ -1,0 +1,362 @@
+.page {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.header {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+/* Card display */
+.cardArea {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  aspect-ratio: 5 / 7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cardBack,
+.cardImg {
+  position: absolute;
+  max-width: 320px;
+  width: 100%;
+  border-radius: 19px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  transition: opacity 0.35s ease;
+}
+
+.cardBack {
+  overflow: hidden;
+  line-height: 0;
+  z-index: 1;
+}
+
+.cardImg[data-layer='front'] {
+  z-index: 2;
+}
+
+.cardBack[data-visible='true'],
+.cardImg[data-visible='true'] {
+  opacity: 1;
+}
+
+.cardBack[data-visible='false'],
+.cardImg[data-visible='false'] {
+  opacity: 0;
+}
+
+.cardInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.cardName {
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.cardType {
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.cardBackImg {
+  width: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn {
+  padding: 12px 28px;
+  border-radius: var(--radius-md);
+  border: none;
+  font-size: 16px;
+  font-weight: 700;
+  transition: all 0.15s;
+  min-height: 48px;
+  cursor: pointer;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.btnNext {
+  composes: btn;
+  background: var(--accent-green);
+  color: var(--bg-primary);
+}
+
+.btnNext:hover:not(:disabled) {
+  background: #22c55e;
+}
+
+.btnPrint {
+  composes: btn;
+  background: var(--accent-blue);
+  color: var(--bg-primary);
+}
+
+.btnPrint:hover:not(:disabled) {
+  background: #3b82f6;
+}
+
+/* Settings */
+.settings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  justify-content: center;
+  align-items: center;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.toggle input {
+  cursor: pointer;
+  accent-color: var(--accent-blue);
+}
+
+.setFilter {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 13px;
+  padding: 8px 28px 8px 10px;
+  min-height: 36px;
+}
+
+.setFilter:focus-visible {
+  border-color: var(--accent-blue);
+}
+
+.message {
+  color: var(--accent-yellow);
+  font-size: 14px;
+  min-height: 20px;
+  text-align: center;
+}
+
+/* Grid view */
+.groupedGrid {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.setGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.collapseControls {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.collapseBtn {
+  font-size: 12px;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.collapseBtn:hover {
+  color: var(--text-secondary);
+  text-decoration: underline;
+}
+
+.setGroupHeader {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 4px;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  text-align: left;
+}
+
+.setGroupHeader:hover {
+  color: var(--text-primary);
+}
+
+.chevron {
+  display: inline-block;
+  transition: transform 0.15s;
+}
+
+.chevron[data-collapsed='false'] {
+  transform: rotate(90deg);
+}
+
+.chevron[data-collapsed='true'] {
+  transform: rotate(0deg);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 8px;
+}
+
+.gridCard {
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: transform 0.15s;
+}
+
+.gridCard:hover {
+  transform: scale(1.03);
+}
+
+.gridCard img {
+  width: 100%;
+  display: block;
+  border-radius: var(--radius-md);
+}
+
+/* Hover / long-press preview tooltip */
+.previewTooltip {
+  position: fixed;
+  z-index: 150;
+  pointer-events: none;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.7));
+}
+
+.previewImg {
+  width: 320px;
+  border-radius: 14px;
+}
+
+.previewName {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
+  background: rgba(0, 0, 0, 0.6);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+}
+
+/* Card detail overlay */
+.detailOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.detailPanel {
+  background: var(--bg-secondary);
+  border-top-left-radius: var(--radius-lg);
+  border-top-right-radius: var(--radius-lg);
+  padding: 20px 16px 32px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 85dvh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.detailClose {
+  align-self: flex-end;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 24px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.detailClose:hover {
+  color: var(--text-primary);
+}
+
+.detailImg {
+  max-width: 280px;
+  width: 100%;
+  border-radius: 14px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.detailName {
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.detailType {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.detailActions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}

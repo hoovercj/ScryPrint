@@ -1,0 +1,141 @@
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--topbar-height);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  z-index: 100;
+}
+
+.brand {
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--text-primary);
+  text-decoration: none;
+  letter-spacing: 0.5px;
+}
+
+.brand:hover {
+  text-decoration: none;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.statusDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.statusDot[data-status='disconnected'] {
+  background: var(--text-muted);
+}
+
+.statusDot[data-status='connecting'] {
+  background: var(--accent-yellow);
+  animation: pulse 1s infinite;
+}
+
+.statusDot[data-status='ready'] {
+  background: var(--accent-green);
+}
+
+.statusDot[data-status='printing'] {
+  background: var(--accent-blue);
+  animation: pulse 0.6s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.statusText {
+  font-size: 13px;
+  color: var(--text-secondary);
+  display: none;
+}
+
+@media (min-width: 480px) {
+  .statusText {
+    display: inline;
+  }
+}
+
+.connectBtn {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  transition: all 0.15s;
+}
+
+.connectBtn:hover:not(:disabled) {
+  background: var(--bg-surface-hover);
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
+
+.settingsBtn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 20px;
+  padding: 4px;
+  line-height: 1;
+  transition: color 0.15s;
+}
+
+.settingsBtn:hover {
+  color: var(--text-primary);
+}
+
+/* Mode navigation tabs — inline in header */
+.modeNav {
+  display: flex;
+  align-items: stretch;
+  align-self: stretch;
+  gap: 0;
+}
+
+.modeTab {
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+}
+
+.modeTab:hover {
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.modeTab[data-active='true'] {
+  color: var(--accent-blue);
+  border-bottom-color: var(--accent-blue);
+}
+
+@media (max-width: 400px) {
+  .modeTab {
+    padding: 0 8px;
+    font-size: 12px;
+  }
+}
