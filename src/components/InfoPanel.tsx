@@ -85,7 +85,7 @@ export function InfoPanel({ open, onClose }: Props) {
             from MTGJSON. Mana symbols by mana-font. Inspired by the
             [momir.io project](https://momir.io) by Devin Cooper.
           </p>
-          <span className={styles.badge}>v0.1.0</span>
+          <span className={styles.badge}>v{__APP_VERSION__}</span>
         </div>
 
         <div className={styles.section}>
