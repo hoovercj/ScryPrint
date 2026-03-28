@@ -38,7 +38,10 @@ export function TopBar() {
   return (
     <>
       <header className={styles.topbar}>
-        <Link to="/" className={styles.brand}>ScryPrint</Link>
+        <Link to="/" className={styles.brand}>
+          <img src={import.meta.env.BASE_URL + 'icon.svg'} alt="" className={styles.brandIcon} />
+          ScryPrint
+        </Link>
         {isModePage && (
           <nav className={styles.modeNav}>
             {MODES.map((m) => (

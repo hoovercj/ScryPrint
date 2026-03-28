@@ -10,13 +10,14 @@ export interface Settings {
   // Planechase
   planechaseSetFilter: string;
   planechaseCollapsedSets: string[];
+  planechasePlayers: number;
   // Archenemy
   archenemySetFilter: string;
   archenemyCollapsedSets: string[];
 }
 
 type SettingsAction =
-  | { type: 'SET'; key: keyof Settings; value: boolean | string | string[] }
+  | { type: 'SET'; key: keyof Settings; value: boolean | string | string[] | number }
   | { type: 'LOAD'; settings: Settings };
 
 const defaults: Settings = {
@@ -28,6 +29,7 @@ const defaults: Settings = {
   paperFeed: 'single',
   planechaseSetFilter: '',
   planechaseCollapsedSets: [],
+  planechasePlayers: 4,
   archenemySetFilter: '',
   archenemyCollapsedSets: [],
 };

@@ -14,11 +14,20 @@
 }
 
 .brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 18px;
   font-weight: 900;
   color: var(--text-primary);
   text-decoration: none;
   letter-spacing: 0.5px;
+}
+
+.brandIcon {
+  height: 24px;
+  width: 24px;
+  object-fit: contain;
 }
 
 .brand:hover {
