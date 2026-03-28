@@ -7,32 +7,36 @@
 export interface DefaultCard {
   name: string;
   /** Scryfall query to find this specific card */
-  query: string;
+  query?: string;
+  /** Direct Scryfall card ID (for cards unsearchable by query) */
+  scryfallId?: string;
   /** Type filter this card belongs to */
   type: string;
+  /** For DFCs — which face to display (0 = front, 1 = back). Defaults to 0. */
+  faceIndex?: number;
 }
 
 export const DEFAULT_STARRED: DefaultCard[] = [
-  // Tokens
-  { name: 'Treasure', query: 't:token treasure', type: 'Token' },
-  { name: 'Food', query: 't:token food', type: 'Token' },
-  { name: 'Clue', query: 't:token clue', type: 'Token' },
-  { name: 'Soldier', query: 't:token soldier pow=1 tou=1 c=w', type: 'Token' },
-  { name: 'Goblin', query: 't:token goblin pow=1 tou=1 c=r', type: 'Token' },
-  { name: 'Zombie', query: 't:token zombie pow=2 tou=2 c=b', type: 'Token' },
-  { name: 'Saproling', query: 't:token saproling pow=1 tou=1 c=g', type: 'Token' },
-  { name: 'Spirit', query: 't:token spirit pow=1 tou=1 c=w', type: 'Token' },
-  { name: 'Beast', query: 't:token beast pow=3 tou=3 c=g', type: 'Token' },
-  { name: 'Angel', query: 't:token angel pow=4 tou=4', type: 'Token' },
-  { name: 'Dragon', query: 't:token dragon pow=5 tou=5 c=r', type: 'Token' },
+  // Tokens (exclude DFCs so we get standalone tokens)
+  { name: 'Treasure', query: 't:token treasure -layout:double_faced_token', type: 'Token' },
+  { name: 'Food', query: 't:token food -layout:double_faced_token', type: 'Token' },
+  { name: 'Clue', query: 't:token clue -layout:double_faced_token', type: 'Token' },
+  { name: 'Soldier', query: 't:token soldier pow=1 tou=1 c=w -layout:double_faced_token', type: 'Token' },
+  { name: 'Goblin', query: 't:token goblin pow=1 tou=1 c=r -layout:double_faced_token', type: 'Token' },
+  { name: 'Zombie', query: 't:token zombie pow=2 tou=2 c=b -layout:double_faced_token', type: 'Token' },
+  { name: 'Saproling', query: 't:token saproling pow=1 tou=1 c=g -layout:double_faced_token', type: 'Token' },
+  { name: 'Spirit', query: 't:token spirit pow=1 tou=1 c=w -layout:double_faced_token', type: 'Token' },
+  { name: 'Beast', query: 't:token beast pow=3 tou=3 c=g -layout:double_faced_token', type: 'Token' },
+  { name: 'Angel', query: 't:token angel pow=4 tou=4 -layout:double_faced_token', type: 'Token' },
+  { name: 'Dragon', query: 't:token dragon pow=5 tou=5 c=r -layout:double_faced_token', type: 'Token' },
 
-  // Emblems
-  { name: 'Monarch', query: 't:emblem monarch', type: 'Emblem' },
-  { name: 'The Initiative', query: 't:emblem initiative', type: 'Emblem' },
-  { name: "City's Blessing", query: "t:emblem city's blessing", type: 'Emblem' },
-  { name: 'The Ring', query: 't:emblem the ring', type: 'Emblem' },
-  { name: 'Day', query: 't:emblem day', type: 'Emblem' },
-  { name: 'Night', query: 't:emblem night', type: 'Emblem' },
+  // Game markers (unsearchable by Scryfall search API — use direct card IDs)
+  { name: 'Monarch', scryfallId: 'f629bba8-e2ef-4d1c-8f64-339879289a6d', type: 'Emblem' },
+  { name: 'The Initiative', scryfallId: '2c65185b-6cf0-451d-985e-56aa45d9a57d', type: 'Emblem', faceIndex: 1 },
+  { name: "City's Blessing", scryfallId: '0fe8112a-46f0-4114-a10b-ed63a3768a4b', type: 'Emblem' },
+  { name: 'The Ring', scryfallId: '7215460e-8c06-47d0-94e5-d1832d0218af', type: 'Emblem' },
+  { name: 'Day', scryfallId: 'dc26e13b-7a0f-4e7f-8593-4f22234f4517', type: 'Emblem' },
+  { name: 'Night', scryfallId: 'dc26e13b-7a0f-4e7f-8593-4f22234f4517', type: 'Emblem', faceIndex: 1 },
 
   // Dungeons
   { name: 'Dungeon of the Mad Mage', query: 't:dungeon "Dungeon of the Mad Mage"', type: 'Dungeon' },
@@ -43,7 +47,7 @@ export const DEFAULT_STARRED: DefaultCard[] = [
 
 export const TYPE_FILTERS = [
   { label: 'All', query: '', display: 'All' },
-  { label: 'Token', query: 't:token', display: 'Tokens' },
+  { label: 'Token', query: 't:token -layout:double_faced_token', display: 'Tokens' },
   { label: 'Emblem', query: 't:emblem', display: 'Emblems' },
   { label: 'Dungeon', query: 't:dungeon', display: 'Dungeons' },
   { label: 'Keyword Counter', query: '__keyword_counter__', display: 'Keyword Counters' },

@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { DEFAULT_STARRED, type DefaultCard } from '../lib/defaults.ts';
-import { searchCards, getImageUri } from '../lib/scryfall.ts';
+import { searchCards, getCardById, getImageUri } from '../lib/scryfall.ts';
 
 const STARRED_KEY = 'scryprint_starred';
 const RECENTS_KEY = 'scryprint_recents';
@@ -12,6 +12,8 @@ export interface QuickPickCard {
   type: string;     // Type filter category
   imageUri?: string; // Small image URL
   query?: string;    // Scryfall query that found this card
+  scryfallId?: string; // Direct Scryfall ID for cards unsearchable by query
+  faceIndex?: number; // For DFCs — which face to display (0 = front, 1 = back)
 }
 
 function loadStarred(): QuickPickCard[] {
@@ -26,6 +28,8 @@ function loadStarred(): QuickPickCard[] {
     name: d.name,
     type: d.type,
     query: d.query,
+    scryfallId: d.scryfallId,
+    faceIndex: d.faceIndex,
   }));
   localStorage.setItem(STARRED_KEY, JSON.stringify(seeded));
   return seeded;
@@ -57,7 +61,7 @@ export function useQuickPick() {
   // Resolve image URIs for default starred cards that don't have them yet
   useEffect(() => {
     const unresolvedDefaults = starred.filter(
-      s => s.id.startsWith('default_') && !s.imageUri && s.query
+      s => s.id.startsWith('default_') && !s.imageUri && (s.query || s.scryfallId)
     );
     if (unresolvedDefaults.length === 0) return;
 
@@ -70,9 +74,15 @@ export function useQuickPick() {
         try {
           // Small delay between requests to respect rate limits
           await new Promise(r => setTimeout(r, 120));
-          const result = await searchCards(card.query!);
-          if (result.data.length > 0) {
-            const imgUri = getImageUri(result.data[0], 'small');
+          let scryfallCard;
+          if (card.scryfallId) {
+            scryfallCard = await getCardById(card.scryfallId);
+          } else {
+            const result = await searchCards(card.query!);
+            scryfallCard = result.data[0];
+          }
+          if (scryfallCard) {
+            const imgUri = getImageUri(scryfallCard, 'small', card.faceIndex);
             if (imgUri) {
               updates[card.id] = imgUri;
             }
@@ -147,7 +157,7 @@ export function useQuickPick() {
             break;
           }
         }
-        result.splice(insertAt, 0, { id: `default_${d.name}`, name: d.name, type: d.type, query: d.query });
+        result.splice(insertAt, 0, { id: `default_${d.name}`, name: d.name, type: d.type, query: d.query, scryfallId: d.scryfallId, faceIndex: d.faceIndex });
       }
       return result;
     });

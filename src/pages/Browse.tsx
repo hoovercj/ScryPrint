@@ -18,6 +18,7 @@ export function Browse() {
   const [activeFilter, setActiveFilter] = useState<TypeFilterLabel>('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCard, setSelectedCard] = useState<ScryfallCard | null>(null);
+  const [selectedFaceIndex, setSelectedFaceIndex] = useState<number | undefined>(undefined);
   const [selectedKeyword, setSelectedKeyword] = useState<KeywordCounter | null>(null);
   const [printings, setPrintings] = useState<ScryfallCard[]>([]);
   const [showPrintings, setShowPrintings] = useState(false);
@@ -58,8 +59,9 @@ export function Browse() {
     return starred.filter(c => c.type === activeFilter);
   }, [starred, activeFilter]);
 
-  const handleSelectCard = useCallback(async (card: ScryfallCard) => {
+  const handleSelectCard = useCallback(async (card: ScryfallCard, faceIndex?: number) => {
     setSelectedCard(card);
+    setSelectedFaceIndex(faceIndex);
     setSelectedKeyword(null);
     setActivePrinting(card);
     setPrintings([]);
@@ -88,6 +90,7 @@ export function Browse() {
       else if (tl.startsWith('Phenomenon')) typeHint = ' t:phenomenon';
       else if (tl.includes('Scheme')) typeHint = ' t:scheme';
       else if (tl.startsWith('Emblem')) typeHint = ' t:emblem';
+      else if (tl.startsWith('Token')) typeHint = ' t:token';
 
       const data = await searchCards(`!"${selectedCard.name}"${typeHint}`, 'prints', { rawQuery: true });
       setPrintings(data.data);
@@ -120,7 +123,7 @@ export function Browse() {
 
       let artImg: ImageBitmap | null = null;
       if (settings.printArt) {
-        const artUrl = getImageUri(cardToPrint, 'art_crop');
+        const artUrl = getImageUri(cardToPrint, 'art_crop', selectedFaceIndex);
         if (artUrl) {
           try { artImg = await fetchCardArt(artUrl); } catch { /* skip art */ }
         }
@@ -187,6 +190,7 @@ export function Browse() {
 
   const handleDragStart = (idx: number) => {
     dragIndexRef.current = idx;
+    starredAnimCtrl.current?.disable();
   };
 
   const handleDragOver = (e: React.DragEvent, idx: number) => {
@@ -202,6 +206,7 @@ export function Browse() {
 
   const handleDragEnd = () => {
     dragIndexRef.current = null;
+    starredAnimCtrl.current?.enable();
   };
 
   // Keyword drag-and-drop reorder (within starred keywords)
@@ -214,6 +219,7 @@ export function Browse() {
   const handleKwDragStart = (keyword: string) => {
     const idx = starredKeywordIds.indexOf(keyword);
     kwDragIndexRef.current = idx;
+    keywordAnimCtrl.current?.disable();
   };
 
   const handleKwDragOver = (e: React.DragEvent, keyword: string) => {
@@ -230,13 +236,16 @@ export function Browse() {
 
   const handleKwDragEnd = () => {
     kwDragIndexRef.current = null;
+    keywordAnimCtrl.current?.enable();
   };
 
   const keywordListRef = useRef<HTMLDivElement>(null);
   const starredGridRef = useRef<HTMLDivElement>(null);
+  const starredAnimCtrl = useRef<{ enable: () => void; disable: () => void } | null>(null);
+  const keywordAnimCtrl = useRef<{ enable: () => void; disable: () => void } | null>(null);
 
   const displayCard = activePrinting || selectedCard;
-  const displayImageUrl = displayCard ? getImageUri(displayCard) : null;
+  const displayImageUrl = displayCard ? getImageUri(displayCard, 'normal', selectedFaceIndex) : null;
 
   const hasSearch = searchQuery.trim().length > 0;
   const hasFilterResults = fullQuery.length > 0 && !isKeywordMode;
@@ -248,7 +257,8 @@ export function Browse() {
     const el = keywordListRef.current;
     if (el) {
       const ctrl = autoAnimate(el, { duration: 250, disrespectUserMotionPreference: true });
-      return () => ctrl.destroy?.();
+      keywordAnimCtrl.current = ctrl;
+      return () => { keywordAnimCtrl.current = null; };
     }
   }, [showKeywordResults]);
 
@@ -256,7 +266,8 @@ export function Browse() {
     const el = starredGridRef.current;
     if (el) {
       const ctrl = autoAnimate(el, { duration: 250, disrespectUserMotionPreference: true });
-      return () => ctrl.destroy?.();
+      starredAnimCtrl.current = ctrl;
+      return () => { starredAnimCtrl.current = null; };
     }
   }, [showStarred]);
 
@@ -344,12 +355,18 @@ export function Browse() {
                     return;
                   }
                   // Default starred cards need a Scryfall fetch to show detail
-                  if (card.id.startsWith('default_') && card.query) {
+                  if (card.id.startsWith('default_') && (card.query || card.scryfallId)) {
                     try {
                       setMessage('Loading...');
-                      const result = await searchCards(card.query);
-                      if (result.data.length > 0) {
-                        handleSelectCard(result.data[0]);
+                      let scryfallCard;
+                      if (card.scryfallId) {
+                        scryfallCard = await getCardById(card.scryfallId);
+                      } else {
+                        const result = await searchCards(card.query!);
+                        scryfallCard = result.data[0];
+                      }
+                      if (scryfallCard) {
+                        handleSelectCard(scryfallCard, card.faceIndex);
                       }
                       setMessage('');
                     } catch {
@@ -397,6 +414,9 @@ export function Browse() {
       {/* Search results */}
       {showSearchResults && (
         <>
+          <div className={styles.sectionHeader}>
+            <span className={styles.sectionTitle}>All {TYPE_FILTERS.find(f => f.label === activeFilter)?.display || 'Results'}</span>
+          </div>
           {searchLoading && <div className={styles.loading}>Searching...</div>}
           <div className={styles.cardGrid}>
             {searchResults.map((card) => {

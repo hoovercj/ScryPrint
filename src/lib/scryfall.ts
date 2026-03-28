@@ -61,9 +61,13 @@ export interface ScryfallList {
 
 /**
  * Get the best image URI for a card (handles DFCs).
+ * Pass faceIndex to select a specific face of a DFC (0 = front, 1 = back).
  */
-export function getImageUri(card: ScryfallCard, size: 'small' | 'normal' | 'art_crop' | 'png' = 'normal'): string | null {
+export function getImageUri(card: ScryfallCard, size: 'small' | 'normal' | 'art_crop' | 'png' = 'normal', faceIndex?: number): string | null {
   if (card.image_uris) return card.image_uris[size];
+  if (faceIndex !== undefined && card.card_faces?.[faceIndex]?.image_uris) {
+    return card.card_faces[faceIndex].image_uris[size];
+  }
   if (card.card_faces?.[0]?.image_uris) return card.card_faces[0].image_uris[size];
   return null;
 }
