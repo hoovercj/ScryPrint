@@ -40,3 +40,11 @@ Deployed to GitHub Pages automatically on push to `main`. The daily creature dat
 ## Tech Stack
 
 React · TypeScript · Vite · React Router · Scryfall API · Web Bluetooth · ESC/POS
+
+## Credits
+
+- [momir-printer](https://github.com/Devin-Cooper/momir-printer) by Devin Cooper — thermal printer rendering logic ported from this project
+- [Scryfall](https://scryfall.com) — card data and images
+- [MTGJSON](https://mtgjson.com) — creature database for Momir mode
+- [mana-font](https://github.com/andrewcourtice/mana-font) — mana symbol rendering
+- [momir.io](https://momir.io) by Devin Cooper — inspiration for the Momir format
