@@ -8,12 +8,14 @@ import { searchCards, getCardById, getImageUri, fetchCardArt, type ScryfallCard 
 import { renderCardToCanvas, renderKeywordCounter } from '../lib/printer/thermalRenderer.ts';
 import { KEYWORD_COUNTERS, type KeywordCounter } from '../lib/keywordCounters.ts';
 import { TYPE_FILTERS, type TypeFilterLabel } from '../lib/defaults.ts';
+import { usePrintingPrefs } from '../hooks/usePrintingPrefs.ts';
 import styles from './Browse.module.css';
 
 export function Browse() {
   const { status, print } = usePrinter();
   const settings = useSettings();
-  const { starred, recents, star, unstar, isStarred, addRecent, reorderStarred, restoreDefaults } = useQuickPick();
+  const { starred, recents, star, unstar, isStarred, addRecent, updateImageByName, reorderStarred, restoreDefaults } = useQuickPick();
+  const { getPreferred, setPreferred } = usePrintingPrefs();
 
   const [activeFilter, setActiveFilter] = useState<TypeFilterLabel>('All');
   const [searchQuery, setSearchQuery] = useState('');
@@ -63,10 +65,20 @@ export function Browse() {
     setSelectedCard(card);
     setSelectedFaceIndex(faceIndex);
     setSelectedKeyword(null);
-    setActivePrinting(card);
     setPrintings([]);
     setShowPrintings(false);
-  }, []);
+
+    // Check for a preferred printing
+    const preferredId = getPreferred(card.name);
+    if (preferredId && preferredId !== card.id) {
+      try {
+        const preferred = await getCardById(preferredId);
+        setActivePrinting(preferred);
+        return;
+      } catch { /* fall through to default */ }
+    }
+    setActivePrinting(card);
+  }, [getPreferred]);
 
   const handleSelectKeyword = useCallback((kw: KeywordCounter) => {
     setSelectedKeyword(kw);
@@ -533,7 +545,14 @@ export function Browse() {
                           key={p.id}
                           className={styles.printingItem}
                           data-selected={activePrinting?.id === p.id}
-                          onClick={() => setActivePrinting(p)}
+                          onClick={() => {
+                            setActivePrinting(p);
+                            if (selectedCard) {
+                              setPreferred(selectedCard.name, p.id);
+                              const img = getImageUri(p, 'small');
+                              if (img) updateImageByName(selectedCard.name, img);
+                            }
+                          }}
                         >
                           <span className={styles.printingSet}>{p.set_name}</span>
                           <span className={styles.printingMeta}>

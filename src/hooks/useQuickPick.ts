@@ -138,6 +138,24 @@ export function useQuickPick() {
     });
   }, []);
 
+  const updateImageByName = useCallback((cardName: string, imageUri: string) => {
+    setStarred(prev => {
+      const idx = prev.findIndex(c => c.name === cardName);
+      if (idx === -1) return prev;
+      const next = [...prev];
+      next[idx] = { ...next[idx], imageUri };
+      return next;
+    });
+    setRecents(prev => {
+      let changed = false;
+      const next = prev.map(c => {
+        if (c.name === cardName) { changed = true; return { ...c, imageUri }; }
+        return c;
+      });
+      return changed ? next : prev;
+    });
+  }, []);
+
   const restoreDefaults = useCallback(() => {
     setStarred(prev => {
       const existing = new Set(prev.map(c => c.name));
@@ -165,5 +183,5 @@ export function useQuickPick() {
     setResolveGen(g => g + 1);
   }, []);
 
-  return { starred, recents, star, unstar, isStarred, addRecent, reorderStarred, restoreDefaults };
+  return { starred, recents, star, unstar, isStarred, addRecent, updateImageByName, reorderStarred, restoreDefaults };
 }
