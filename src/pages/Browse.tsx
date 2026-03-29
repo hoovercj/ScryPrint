@@ -434,7 +434,7 @@ export function Browse() {
       {showSearchResults && (
         <>
           <div className={styles.sectionHeader}>
-            <span className={styles.sectionTitle}>All {TYPE_FILTERS.find(f => f.label === activeFilter)?.display || 'Results'}</span>
+            <span className={styles.sectionTitle}>{activeFilter === 'All' ? 'Results' : `All ${TYPE_FILTERS.find(f => f.label === activeFilter)?.display || 'Results'}`}</span>
           </div>
           {searchLoading && <div className={styles.loading}>Searching...</div>}
           <div className={styles.cardGrid}>

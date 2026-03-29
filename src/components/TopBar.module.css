@@ -3,10 +3,10 @@
   top: 0;
   left: 0;
   right: 0;
-  height: var(--topbar-height);
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-subtle);
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   padding: 0 16px;
@@ -22,6 +22,7 @@
   color: var(--text-primary);
   text-decoration: none;
   letter-spacing: 0.5px;
+  height: 52px;
 }
 
 .brandIcon {
@@ -38,6 +39,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  height: 52px;
 }
 
 .statusDot {
@@ -112,12 +114,22 @@
   color: var(--text-primary);
 }
 
-/* Mode navigation tabs — inline in header */
+/* Mode navigation tabs — wraps to second row on narrow screens */
 .modeNav {
   display: flex;
   align-items: stretch;
-  align-self: stretch;
   gap: 0;
+  order: 3;
+  height: 52px;
+}
+
+/* When nav wraps, it takes full width as a second row */
+@media (max-width: 539px) {
+  .modeNav {
+    flex-basis: 100%;
+    justify-content: center;
+    border-top: 1px solid var(--border-subtle);
+  }
 }
 
 .modeTab {
@@ -133,13 +145,11 @@
   transition: all 0.15s;
 }
 
-.modeTabLabel {
-  display: none;
-}
+.modeTabLabel {}
 
-@media (min-width: 540px) {
+@media (max-width: 539px) {
   .modeTabLabel {
-    display: inline;
+    display: none;
   }
 }
 
@@ -153,8 +163,8 @@
   border-bottom-color: var(--accent-blue);
 }
 
-@media (max-width: 400px) {
+@media (max-width: 539px) {
   .modeTab {
-    padding: 0 10px;
+    padding: 0 16px;
   }
 }

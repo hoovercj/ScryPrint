@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { usePrinter } from '../hooks/usePrinter.ts';
 import { InfoPanel } from './InfoPanel.tsx';
@@ -17,6 +17,18 @@ export function TopBar() {
   const location = useLocation();
 
   const isModePage = MODES.some(m => m.path === location.pathname);
+
+  // Sync CSS custom property with actual topbar height (handles wrap)
+  const topbarRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const el = topbarRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([entry]) => {
+      document.documentElement.style.setProperty('--topbar-height', `${entry.borderBoxSize[0].blockSize}px`);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   const handleConnect = async () => {
     try {
@@ -37,7 +49,7 @@ export function TopBar() {
 
   return (
     <>
-      <header className={styles.topbar}>
+      <header className={styles.topbar} ref={topbarRef}>
         <Link to="/" className={styles.brand}>
           <img src={import.meta.env.BASE_URL + 'icon.svg'} alt="" className={styles.brandIcon} />
           ScryPrint
