@@ -25,3 +25,4 @@ scripts/AtomicCards.json
 *.njsproj
 *.sln
 *.sw?
+.playwright-mcp/

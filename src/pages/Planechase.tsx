@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { usePrinter } from '../hooks/usePrinter.ts';
 import { useSettings, useSettingsDispatch } from '../context/SettingsContext.tsx';
+import { useLocale } from '../hooks/useLocale.ts';
 import { getRandomCard, searchCards, getImageUri, fetchCardArt, type ScryfallCard } from '../lib/scryfall.ts';
 import { renderCardToCanvas } from '../lib/printer/thermalRenderer.ts';
 import { FormatInfo } from '../components/FormatInfo.tsx';
@@ -35,6 +36,7 @@ export function Planechase() {
   const { status, print } = usePrinter();
   const settings = useSettings();
   const settingsDispatch = useSettingsDispatch();
+  const { t } = useLocale();
 
   // Tab
   const [activeTab, setActiveTab] = useState<Tab>('play');
@@ -221,7 +223,7 @@ export function Planechase() {
 
   // === Print ===
   const handlePrintCard = async (card: ScryfallCard) => {
-    setMessage('Printing...');
+    setMessage(t('planechase.printing'));
     try {
       let artImg: ImageBitmap | null = null;
       if (settings.printArt) {
@@ -383,10 +385,10 @@ export function Planechase() {
       {isAllSets && (
         <div className={styles.collapseControls}>
           <button className={styles.collapseBtn} onClick={() => settingsDispatch({ type: 'SET', key: 'planechaseCollapsedSets', value: [] })}>
-            Expand All
+            {t('planechase.expandAll')}
           </button>
           <button className={styles.collapseBtn} onClick={() => settingsDispatch({ type: 'SET', key: 'planechaseCollapsedSets', value: groupedCards.map(([name]) => name) })}>
-            Collapse All
+            {t('planechase.collapseAll')}
           </button>
         </div>
       )}
@@ -410,7 +412,7 @@ export function Planechase() {
   return (
     <div className={styles.page}>
       <div className={styles.titleRow}>
-        <h2 className={styles.header}>Planechase</h2>
+        <h2 className={styles.header}>{t('planechase.title')}</h2>
         <FormatInfo
           title="Planechase"
           description="Build a shared planar deck (singleton). Min deck size and max phenomena scale with player count. Roll the planar die each turn — planeswalk to a new plane or trigger its chaos ability."
@@ -424,13 +426,13 @@ export function Planechase() {
           className={`${styles.tab} ${activeTab === 'play' ? styles.tabActive : ''}`}
           onClick={() => setActiveTab('play')}
         >
-          Play
+          {t('planechase.play')}
         </button>
         <button
           className={`${styles.tab} ${activeTab === 'build' ? styles.tabActive : ''}`}
           onClick={() => setActiveTab('build')}
         >
-          Deck{deck.deckSize > 0 ? ` (${deck.deckSize})` : ''}
+          {t('planechase.deck')}{deck.deckSize > 0 ? ` (${deck.deckSize})` : ''}
         </button>
       </div>
 
@@ -443,7 +445,7 @@ export function Planechase() {
               {rolling ? '?' : <DieIcon result={dieResult ?? 'idle'} />}
             </button>
             <div className={styles.dieResult} data-result={dieResult || (rolling ? '' : 'idle')}>
-              {dieResult === 'planeswalk' && <><i className="ms ms-planeswalker" /> Planeswalk!</>}
+              {dieResult === 'planeswalk' && <><i className="ms ms-planeswalker" /> {t('planechase.planeswalk')}!</>}
               {dieResult === 'chaos' && <><i className="ms ms-chaos" /> Chaos!</>}
               {dieResult === 'blank' && 'Nothing happens'}
               {!dieResult && !rolling && 'Roll the planar die\u2026'}
@@ -454,19 +456,19 @@ export function Planechase() {
             /* --- Deck Play Mode --- */
             <>
               <div className={styles.deckProgress}>
-                <span className={styles.deckProgressCount}>{deck.drawIndex} / {deck.deckSize}</span> planes visited
+                <span className={styles.deckProgressCount}>{deck.drawIndex} / {deck.deckSize}</span> {t('planechase.drawn')}
               </div>
 
               <div className={styles.actions}>
                 <button className={styles.btnNext} onClick={handleDeckDraw} disabled={deck.isExhausted}>
-                  {deck.isExhausted ? 'Deck Empty' : 'Planeswalk'}
+                  {deck.isExhausted ? t('planechase.deckEmpty') : t('planechase.planeswalk')}
                 </button>
                 <button className={styles.btnPrint} onClick={handlePrint} disabled={!displayCard || status !== 'ready'}>
-                  Print
+                  {t('planechase.print')}
                 </button>
                 <label className={styles.toggle}>
                   <input type="checkbox" checked={settings.autoPrint} onChange={(e) => settingsDispatch({ type: 'SET', key: 'autoPrint', value: e.target.checked })} />
-                  Auto-print
+                  {t('planechase.autoprint')}
                 </label>
               </div>
 
@@ -502,8 +504,8 @@ export function Planechase() {
               )}
 
               <div className={styles.deckActions}>
-                <button className={styles.btnSmall} onClick={handleReshuffle}>Reshuffle</button>
-                <button className={styles.btnSmall} onClick={handleEndGame}>End Game</button>
+                <button className={styles.btnSmall} onClick={handleReshuffle}>{t('planechase.reshuffle')}</button>
+                <button className={styles.btnSmall} onClick={handleEndGame}>{t('planechase.endGame')}</button>
               </div>
 
               {/* Played cards */}
@@ -511,7 +513,7 @@ export function Planechase() {
                 <div className={styles.playedSection}>
                   <button className={styles.playedToggle} onClick={() => setShowPlayed(!showPlayed)}>
                     <span className={styles.chevron} data-collapsed={!showPlayed}>▸</span>
-                    Visited Planes ({deck.played.length})
+                    {t('planechase.played')} ({deck.played.length})
                   </button>
                   {showPlayed && (
                     <div className={styles.playedGrid}>
@@ -534,14 +536,14 @@ export function Planechase() {
             <>
               <div className={styles.actions}>
                 <button className={styles.btnNext} onClick={nextPlane} disabled={loadingNext}>
-                  {loadingNext ? 'Loading...' : 'Planeswalk'}
+                  {loadingNext ? t('planechase.loading') : t('planechase.planeswalk')}
                 </button>
                 <button className={styles.btnPrint} onClick={handlePrint} disabled={!displayCard || status !== 'ready'}>
-                  Print
+                  {t('planechase.print')}
                 </button>
                 <label className={styles.toggle}>
                   <input type="checkbox" checked={settings.autoPrint} onChange={(e) => settingsDispatch({ type: 'SET', key: 'autoPrint', value: e.target.checked })} />
-                  Auto-print
+                  {t('planechase.autoprint')}
                 </label>
               </div>
 
@@ -557,7 +559,7 @@ export function Planechase() {
                 </select>
                 <label className={styles.toggle}>
                   <input type="checkbox" checked={showAll} onChange={handleShowAll} disabled={loadingAll} />
-                  Show All Cards
+                  {t('planechase.showAll')}
                 </label>
               </div>
 
@@ -643,17 +645,17 @@ export function Planechase() {
 
           <div className={styles.deckQuickActions}>
             <button className={styles.linkBtn} onClick={buildForMe} disabled={allCards.length === 0}>
-              Build for me
+              {t('planechase.buildForMe')}
             </button>
             <button className={styles.linkBtn} onClick={() => deck.addAll(allCards)} disabled={allCards.length === 0}>
-              Add All
+              {t('planechase.addAll')}
             </button>
             <button className={styles.linkBtn} onClick={deck.clearDeck} disabled={deck.deckSize === 0}>
-              Clear
+              {t('planechase.clear')}
             </button>
           </div>
 
-          {loadingAll && <div className={styles.message}>Loading cards…</div>}
+          {loadingAll && <div className={styles.message}>{t('planechase.loadingCards')}</div>}
 
           {groupedCards.length > 0 && renderGroupedGrid(true)}
         </>
@@ -701,11 +703,11 @@ export function Planechase() {
               <div className={styles.detailActions}>
                 {!deck.isPlaying && (
                   <button className={styles.btnNext} onClick={() => planeswalkTo(selectedCard)}>
-                    Planeswalk Here
+                    {t('planechase.planeswalkHere')}
                   </button>
                 )}
                 <button className={styles.btnPrint} onClick={() => handlePrintCard(selectedCard)} disabled={status !== 'ready'}>
-                  Print
+                  {t('planechase.print')}
                 </button>
               </div>
               <div className={styles.detailDeckRow}>
@@ -723,7 +725,7 @@ export function Planechase() {
                     aria-label="Add to deck"
                   >+</button>
                 )}
-                <span className={styles.detailDeckQty}>{qty > 0 ? 'In deck' : 'Not in deck'}</span>
+                <span className={styles.detailDeckQty}>{qty > 0 ? t('planechase.inDeck') : t('planechase.notInDeck')}</span>
               </div>
             </div>
           </div>
@@ -735,17 +737,17 @@ export function Planechase() {
         <div className={styles.dialogOverlay} onClick={() => setShowInvalidDialog(false)}>
           <div className={styles.dialog} onClick={(e) => e.stopPropagation()}>
             <button className={styles.dialogClose} onClick={() => setShowInvalidDialog(false)} aria-label="Close">&times;</button>
-            <div className={styles.dialogTitle}>Deck is Invalid</div>
+            <div className={styles.dialogTitle}>{t('planechase.invalidDeck')}</div>
             <div className={styles.dialogBody}>
               {!deck.isLegal && <p>Need at least {minDeckSize} cards (currently {deck.deckSize}).</p>}
               {!phenomenaLegal && <p>Too many phenomena: {phenomenaInDeck}/{maxPhenomena} allowed.</p>}
             </div>
             <div className={styles.dialogActions}>
               <button className={styles.btnNext} onClick={() => { setShowInvalidDialog(false); handleStartDeck(); }}>
-                Play Anyway
+                {t('planechase.playAnyway')}
               </button>
               <button className={styles.btnSmall} onClick={() => { setShowInvalidDialog(false); setActiveTab('build'); }}>
-                Edit Deck
+                {t('planechase.editDeck')}
               </button>
             </div>
           </div>

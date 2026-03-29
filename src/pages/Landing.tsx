@@ -1,47 +1,51 @@
 import { Link } from 'react-router-dom';
+import { useLocale } from '../hooks/useLocale.ts';
+import type { LocaleKey } from '../locales/index.ts';
 import styles from './Landing.module.css';
 
 const MODES = [
   {
     to: '/momir',
     iconClass: 'ms ms-creature',
-    name: 'Momir',
-    desc: 'Roll a random creature by mana value',
+    nameKey: 'landing.momir' as LocaleKey,
+    descKey: 'landing.momir.desc' as LocaleKey,
   },
   {
     to: '/planechase',
     iconClass: 'ms ms-planeswalker',
-    name: 'Planechase',
-    desc: 'Draw a random plane and roll the planar die',
+    nameKey: 'landing.planechase' as LocaleKey,
+    descKey: 'landing.planechase.desc' as LocaleKey,
   },
   {
     to: '/archenemy',
     iconClass: 'ms ms-scheme',
-    name: 'Archenemy',
-    desc: 'Set schemes in motion as the Archenemy',
+    nameKey: 'landing.archenemy' as LocaleKey,
+    descKey: 'landing.archenemy.desc' as LocaleKey,
   },
   {
     to: '/browse',
     iconClass: 'ms ms-ability-investigate',
-    name: 'Browse & Print',
-    desc: 'Find any card, token, or emblem and print it',
+    nameKey: 'landing.browse' as LocaleKey,
+    descKey: 'landing.browse.desc' as LocaleKey,
   },
 ] as const;
 
 export function Landing() {
+  const { t } = useLocale();
+
   return (
     <div className={styles.page}>
       <h1 className={styles.title}>ScryPrint</h1>
       <p className={styles.subtitle}>
-        What are you playing today?
+        {t('landing.subtitle')}
       </p>
       <div className={styles.modes}>
         {MODES.map((mode) => (
           <Link key={mode.to} to={mode.to} className={styles.modeCard}>
             <span className={styles.modeIcon}><i className={mode.iconClass} /></span>
             <div className={styles.modeInfo}>
-              <div className={styles.modeName}>{mode.name}</div>
-              <div className={styles.modeDesc}>{mode.desc}</div>
+              <div className={styles.modeName}>{t(mode.nameKey)}</div>
+              <div className={styles.modeDesc}>{t(mode.descKey)}</div>
             </div>
             <span className={styles.arrow}>›</span>
           </Link>

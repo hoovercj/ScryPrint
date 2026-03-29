@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLocale } from '../hooks/useLocale.ts';
 import styles from './InfoPanel.module.css';
 
 interface Props {
@@ -8,6 +9,7 @@ interface Props {
 
 export function InfoPanel({ open, onClose }: Props) {
   const [confirmReset, setConfirmReset] = useState(false);
+  const { t } = useLocale();
 
   if (!open) return null;
 
@@ -25,35 +27,32 @@ export function InfoPanel({ open, onClose }: Props) {
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.panel} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
-          <span className={styles.title}>About ScryPrint</span>
+          <span className={styles.title}>{t('info.title')}</span>
           <button className={styles.closeBtn} onClick={onClose}>&times;</button>
         </div>
 
         <div className={styles.section}>
           <p className={styles.text}>
-            Print MTG cards, tokens, and counters on Phomemo thermal printers
-            via Web Bluetooth. Just connect from your browser, no app or downloads required!
+            {t('info.desc')}
           </p>
         </div>
 
         <div className={styles.section}>
-          <div className={styles.sectionLabel}>Supported Printers</div>
+          <div className={styles.sectionLabel}>{t('info.printers')}</div>
           <p className={styles.text}>
-            Phomemo T02, M02, M02S, M02 Pro, M04S, M04AS — any of the simple "continuous feed" Phomemo BLE
-            thermal printers should work. The printers that print individual pre-cut labels or stickers are unlikely to work. The printer is auto-detected on connect.
+            {t('info.printers.desc')}
           </p>
         </div>
 
         <div className={styles.section}>
-          <div className={styles.sectionLabel}>Browser Support</div>
+          <div className={styles.sectionLabel}>{t('info.browser')}</div>
           <p className={styles.text}>
-            Requires Web Bluetooth API. Supported in Chrome, Edge, and Opera
-            on desktop and Android. Not available in Firefox or Safari.
+            {t('info.browser.desc')}
           </p>
         </div>
 
         <div className={styles.section}>
-          <div className={styles.sectionLabel}>Links</div>
+          <div className={styles.sectionLabel}>{t('info.links')}</div>
           <ul className={styles.linkList}>
             <li>
               <a href="https://github.com/cohoov/MTGThermalPrinter" target="_blank" rel="noopener noreferrer">
@@ -79,11 +78,9 @@ export function InfoPanel({ open, onClose }: Props) {
         </div>
 
         <div className={styles.section}>
-          <div className={styles.sectionLabel}>Credits</div>
+          <div className={styles.sectionLabel}>{t('info.credits')}</div>
           <p className={styles.text}>
-            Card data and images provided by Scryfall. Creature database
-            from MTGJSON. Mana symbols by mana-font. Inspired by the
-            [momir.io project](https://momir.io) by Devin Cooper.
+            {t('info.credits.desc')}
           </p>
           <span className={styles.badge}>v{__APP_VERSION__}</span>
         </div>
@@ -93,10 +90,10 @@ export function InfoPanel({ open, onClose }: Props) {
             className={confirmReset ? styles.resetBtnConfirm : styles.resetBtn}
             onClick={handleReset}
           >
-            {confirmReset ? 'Are you sure? This will reload the page.' : 'Reset all preferences'}
+            {confirmReset ? t('info.resetConfirm') : t('info.reset')}
           </button>
           <p className={styles.text} style={{ fontSize: 12 }}>
-            Clears your starred cards, recent cards, preferred printings, and settings.
+            {t('info.resetDesc')}
           </p>
         </div>
       </div>

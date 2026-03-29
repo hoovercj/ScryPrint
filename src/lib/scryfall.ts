@@ -35,6 +35,10 @@ export interface ScryfallCard {
   set: string;
   collector_number: string;
   artist?: string;
+  printed_name?: string;
+  printed_type_line?: string;
+  printed_text?: string;
+  lang?: string;
   image_uris?: {
     small: string;
     normal: string;
@@ -76,10 +80,11 @@ export function getImageUri(card: ScryfallCard, size: 'small' | 'normal' | 'art_
  * Search Scryfall with a query string.
  * Appends game:paper to exclude Alchemy-only cards.
  */
-export async function searchCards(query: string, unique?: 'cards' | 'art' | 'prints', options?: { rawQuery?: boolean }): Promise<ScryfallList> {
+export async function searchCards(query: string, unique?: 'cards' | 'art' | 'prints', options?: { rawQuery?: boolean; lang?: string }): Promise<ScryfallList> {
   const fullQuery = options?.rawQuery ? query : `${query} game:paper`;
   const params = new URLSearchParams({ q: fullQuery, format: 'json' });
   if (unique) params.set('unique', unique);
+  if (options?.lang && options.lang !== 'en') params.set('include_multilingual', 'true');
   const resp = await throttledFetch(`${API_BASE}/cards/search?${params}`);
   return resp.json();
 }
@@ -88,8 +93,8 @@ export async function searchCards(query: string, unique?: 'cards' | 'art' | 'pri
  * Get a random card matching a query.
  * Appends game:paper to exclude Alchemy-only cards.
  */
-export async function getRandomCard(query: string): Promise<ScryfallCard> {
-  const fullQuery = `${query} game:paper`;
+export async function getRandomCard(query: string, lang?: string): Promise<ScryfallCard> {
+  const fullQuery = lang && lang !== 'en' ? `${query} game:paper lang:${lang}` : `${query} game:paper`;
   const params = new URLSearchParams({ q: fullQuery, format: 'json' });
   const resp = await throttledFetch(`${API_BASE}/cards/random?${params}`);
   return resp.json();
@@ -98,8 +103,11 @@ export async function getRandomCard(query: string): Promise<ScryfallCard> {
 /**
  * Get a specific card by Scryfall ID.
  */
-export async function getCardById(id: string): Promise<ScryfallCard> {
-  const resp = await throttledFetch(`${API_BASE}/cards/${encodeURIComponent(id)}`);
+export async function getCardById(id: string, lang?: string): Promise<ScryfallCard> {
+  const url = lang && lang !== 'en'
+    ? `${API_BASE}/cards/${encodeURIComponent(id)}/${lang}`
+    : `${API_BASE}/cards/${encodeURIComponent(id)}`;
+  const resp = await throttledFetch(url);
   return resp.json();
 }
 

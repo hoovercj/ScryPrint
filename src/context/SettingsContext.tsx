@@ -1,4 +1,5 @@
 import { createContext, useContext, useReducer, useEffect, type ReactNode, type Dispatch } from 'react';
+import type { LangCode } from '../lib/i18n.ts';
 
 export interface Settings {
   autoPrint: boolean;
@@ -7,6 +8,7 @@ export interface Settings {
   includeFunny: boolean;
   ditheringMode: 'floyd-steinberg' | 'threshold';
   paperFeed: 'none' | 'single' | 'double';
+  language: LangCode;
   // Planechase
   planechaseSetFilter: string;
   planechaseCollapsedSets: string[];
@@ -27,6 +29,7 @@ const defaults: Settings = {
   includeFunny: false,
   ditheringMode: 'floyd-steinberg',
   paperFeed: 'single',
+  language: 'en',
   planechaseSetFilter: '',
   planechaseCollapsedSets: [],
   planechasePlayers: 4,

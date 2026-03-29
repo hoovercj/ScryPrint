@@ -4,16 +4,28 @@ import { usePrinter } from '../hooks/usePrinter.ts';
 import { useSettings } from '../context/SettingsContext.tsx';
 import { useScryfall } from '../hooks/useScryfall.ts';
 import { useQuickPick } from '../hooks/useQuickPick.ts';
+import { useLocale } from '../hooks/useLocale.ts';
 import { searchCards, getCardById, getImageUri, fetchCardArt, type ScryfallCard } from '../lib/scryfall.ts';
 import { renderCardToCanvas, renderKeywordCounter } from '../lib/printer/thermalRenderer.ts';
 import { KEYWORD_COUNTERS, type KeywordCounter } from '../lib/keywordCounters.ts';
 import { TYPE_FILTERS, type TypeFilterLabel } from '../lib/defaults.ts';
 import { usePrintingPrefs } from '../hooks/usePrintingPrefs.ts';
+import type { LocaleKey } from '../locales/index.ts';
 import styles from './Browse.module.css';
+
+const FILTER_LOCALE_MAP: Record<string, LocaleKey> = {
+  'All': 'browse.all',
+  'Tokens': 'browse.tokens',
+  'Emblems': 'browse.emblems',
+  'Dungeons': 'browse.dungeons',
+  'Keyword Counters': 'browse.keywords',
+  'Conspiracies': 'browse.conspiracies',
+};
 
 export function Browse() {
   const { status, print } = usePrinter();
   const settings = useSettings();
+  const { t } = useLocale();
   const { starred, recents, star, unstar, isStarred, addRecent, updateImageByName, reorderStarred, restoreDefaults } = useQuickPick();
   const { getPreferred, setPreferred } = usePrintingPrefs();
 
@@ -292,7 +304,7 @@ export function Browse() {
 
   return (
     <div className={styles.page}>
-      <h2 className={styles.header}>Browse & Print</h2>
+      <h2 className={styles.header}>{t('browse.title')}</h2>
 
       {/* Type filter chips */}
       <div className={styles.filters}>
@@ -303,7 +315,7 @@ export function Browse() {
             data-active={activeFilter === f.label}
             onClick={() => { setActiveFilter(f.label); setSearchQuery(''); setMessage(''); }}
           >
-            {f.display}
+            {FILTER_LOCALE_MAP[f.display] ? t(FILTER_LOCALE_MAP[f.display]) : f.display}
           </button>
         ))}
       </div>
@@ -313,7 +325,7 @@ export function Browse() {
         <input
           className={styles.searchBox}
           type="text"
-          placeholder="Search Scryfall..."
+          placeholder={t('browse.search')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
@@ -355,8 +367,8 @@ export function Browse() {
       {showStarred && (
         <>
           <div className={styles.sectionHeader}>
-            <span className={styles.sectionTitle}>Starred</span>
-            <button className={styles.restoreLink} onClick={restoreDefaults}>Restore defaults</button>
+            <span className={styles.sectionTitle}>{t('browse.starred')}</span>
+            <button className={styles.restoreLink} onClick={restoreDefaults}>{t('browse.restore')}</button>
           </div>
           <div className={styles.cardGrid} ref={starredGridRef}>
             {filteredStarred.map((card, idx) => (
@@ -434,7 +446,7 @@ export function Browse() {
       {showSearchResults && (
         <>
           <div className={styles.sectionHeader}>
-            <span className={styles.sectionTitle}>{activeFilter === 'All' ? 'Results' : `All ${TYPE_FILTERS.find(f => f.label === activeFilter)?.display || 'Results'}`}</span>
+            <span className={styles.sectionTitle}>{activeFilter === 'All' ? t('browse.results') : `${FILTER_LOCALE_MAP[TYPE_FILTERS.find(f => f.label === activeFilter)?.display ?? ''] ? t(FILTER_LOCALE_MAP[TYPE_FILTERS.find(f => f.label === activeFilter)?.display ?? ''] as LocaleKey) : t('browse.results')}`}</span>
           </div>
           {searchLoading && <div className={styles.loading}>Searching...</div>}
           <div className={styles.cardGrid}>
@@ -543,7 +555,7 @@ export function Browse() {
                 {/* Printings dropdown (hidden for dungeons) */}
                 {!displayCard?.type_line?.startsWith('Dungeon') && <div className={styles.printingsSection}>
                   {loadingPrintings ? (
-                    <div className={styles.printingsLoading}>Loading printings…</div>
+                    <div className={styles.printingsLoading}>{t('browse.loading')}</div>
                   ) : printings.length > 1 ? (
                     <select
                       className={styles.printingsSelect}
@@ -566,7 +578,7 @@ export function Browse() {
               onClick={handlePrint}
               disabled={status !== 'ready'}
             >
-              Print
+              {t('browse.print')}
             </button>
           </div>
         </div>

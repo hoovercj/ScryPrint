@@ -116,6 +116,79 @@
   color: var(--text-primary);
 }
 
+/* Language picker */
+.langPicker {
+  position: relative;
+}
+
+.langBtn {
+  background: none;
+  border: none;
+  font-size: 22px;
+  padding: 4px;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.langBtn:hover {
+  transform: scale(1.15);
+}
+
+.langDropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 6px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  z-index: 200;
+  min-width: 180px;
+  max-height: 340px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+.langDropdown::-webkit-scrollbar { width: 6px; background: transparent; }
+.langDropdown::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 3px; }
+
+.langOption {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 14px;
+  border: none;
+  background: none;
+  color: var(--text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.1s;
+  text-align: left;
+}
+
+.langOption:hover {
+  background: var(--bg-surface-hover);
+  color: var(--text-primary);
+}
+
+.langOption[data-active='true'] {
+  color: var(--accent-blue);
+  font-weight: 700;
+}
+
+.langFlag {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.langName {
+  white-space: nowrap;
+}
+
 /* Mode navigation tabs — inline or wrapped row depending on viewport */
 .modeNav {
   display: flex;

@@ -1,21 +1,28 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { usePrinter } from '../hooks/usePrinter.ts';
+import { useLocale } from '../hooks/useLocale.ts';
+import { useSettingsDispatch } from '../context/SettingsContext.tsx';
+import { LANGUAGES } from '../lib/i18n.ts';
 import { InfoPanel } from './InfoPanel.tsx';
 import styles from './TopBar.module.css';
 
 const MODES = [
-  { path: '/momir', label: 'Momir', icon: 'ms ms-creature' },
-  { path: '/planechase', label: 'Planechase', icon: 'ms ms-planeswalker' },
-  { path: '/archenemy', label: 'Archenemy', icon: 'ms ms-scheme' },
-  { path: '/browse', label: 'Browse', icon: 'ms ms-ability-investigate' },
+  { path: '/momir', labelKey: 'nav.momir' as const, icon: 'ms ms-creature' },
+  { path: '/planechase', labelKey: 'nav.planechase' as const, icon: 'ms ms-planeswalker' },
+  { path: '/archenemy', labelKey: 'nav.archenemy' as const, icon: 'ms ms-scheme' },
+  { path: '/browse', labelKey: 'nav.browse' as const, icon: 'ms ms-ability-investigate' },
 ] as const;
 
 const NAV_INLINE_QUERY = '(min-width: 768px)';
 
 export function TopBar() {
   const { status, modelName, connect, disconnect } = usePrinter();
+  const { t, language } = useLocale();
+  const dispatch = useSettingsDispatch();
   const [infoOpen, setInfoOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+  const langRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
 
   const isModePage = MODES.some(m => m.path === location.pathname);
@@ -41,6 +48,16 @@ export function TopBar() {
     return () => ro.disconnect();
   }, []);
 
+  // Close language picker on outside click
+  useEffect(() => {
+    if (!langOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (langRef.current && !langRef.current.contains(e.target as Node)) setLangOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [langOpen]);
+
   const handleConnect = async () => {
     try {
       if (status === 'ready') {
@@ -55,8 +72,13 @@ export function TopBar() {
 
   const statusLabel =
     status === 'ready' && modelName
-      ? `${modelName} Connected`
-      : status.charAt(0).toUpperCase() + status.slice(1);
+      ? `${modelName} ${t('topbar.connected')}`
+      : status === 'disconnected' ? t('topbar.disconnected')
+      : status === 'connecting' ? t('topbar.connecting')
+      : status === 'printing' ? t('topbar.printing')
+      : t('topbar.ready');
+
+  const currentFlag = LANGUAGES.find(l => l.code === language)?.flag ?? '🇺🇸';
 
   const navTabs = MODES.map((m) => (
     <Link
@@ -66,7 +88,7 @@ export function TopBar() {
       data-active={location.pathname === m.path}
     >
       <i className={m.icon} />
-      <span className={styles.modeTabLabel}>{m.label}</span>
+      <span className={styles.modeTabLabel}>{t(m.labelKey)}</span>
     </Link>
   ));
 
@@ -88,8 +110,32 @@ export function TopBar() {
             onClick={handleConnect}
             disabled={status === 'connecting' || status === 'printing'}
           >
-            {status === 'ready' ? 'Disconnect' : 'Connect'}
+            {status === 'ready' ? t('topbar.disconnect') : t('topbar.connect')}
           </button>
+          <div className={styles.langPicker} ref={langRef}>
+            <button
+              className={styles.langBtn}
+              onClick={() => setLangOpen(o => !o)}
+              aria-label="Language"
+            >
+              {currentFlag}
+            </button>
+            {langOpen && (
+              <div className={styles.langDropdown}>
+                {LANGUAGES.map((lang) => (
+                  <button
+                    key={lang.code}
+                    className={styles.langOption}
+                    data-active={language === lang.code}
+                    onClick={() => { dispatch({ type: 'SET', key: 'language', value: lang.code }); setLangOpen(false); }}
+                  >
+                    <span className={styles.langFlag}>{lang.flag}</span>
+                    <span className={styles.langName}>{lang.name}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           <button
             className={styles.settingsBtn}
             onClick={() => setInfoOpen(true)}

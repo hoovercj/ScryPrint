@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSettings, useSettingsDispatch } from '../context/SettingsContext.tsx';
 import { usePrinter } from '../hooks/usePrinter.ts';
+import { useLocale } from '../hooks/useLocale.ts';
 import { renderCardToCanvas, type CardRenderData } from '../lib/printer/thermalRenderer.ts';
 import { scryfallImageUrl, fetchCardArt } from '../lib/scryfall.ts';
 import { FormatInfo } from '../components/FormatInfo.tsx';
@@ -33,11 +34,13 @@ export function Momir() {
   const settings = useSettings();
   const settingsDispatch = useSettingsDispatch();
   const { status, print } = usePrinter();
+  const { t } = useLocale();
 
   const [db, setDb] = useState<CreaturesDB | null>(null);
   const [selectedMV, setSelectedMV] = useState<number | null>(null);
   const [currentCard, setCurrentCard] = useState<Creature | null>(null);
-  const [message, setMessage] = useState('Loading card database...');
+  const [messageKey, setMessageKey] = useState<'momir.loading' | 'momir.pick' | 'momir.loadFailed' | 'momir.noCreatures' | 'momir.printing' | null>('momir.loading');
+  const [messageText, setMessageText] = useState<string | null>(null);
   const [phase, setPhase] = useState<CardPhase>('idle');
   const hiddenRollRef = useRef(0);
 
@@ -47,10 +50,12 @@ export function Momir() {
       .then(r => r.json())
       .then((data: CreaturesDB) => {
         setDb(data);
-        setMessage('Pick a mana value and roll');
+        setMessageKey('momir.pick');
+        setMessageText(null);
       })
       .catch(() => {
-        setMessage('Failed to load card database');
+        setMessageKey('momir.loadFailed');
+        setMessageText(null);
       });
   }, []);
 
@@ -61,7 +66,8 @@ export function Momir() {
     if (filtered.length === 0) {
       setCurrentCard(null);
       setPhase('idle');
-      setMessage('No creatures at this mana value');
+      setMessageKey('momir.noCreatures');
+      setMessageText(null);
       return;
     }
     const creature = filtered[Math.floor(Math.random() * filtered.length)];
@@ -72,10 +78,12 @@ export function Momir() {
 
     if (settings.hidePreview) {
       const idx = hiddenRollRef.current;
-      setMessage(HIDDEN_ROLL_MESSAGES[idx % HIDDEN_ROLL_MESSAGES.length]);
+      setMessageKey(null);
+      setMessageText(HIDDEN_ROLL_MESSAGES[idx % HIDDEN_ROLL_MESSAGES.length]);
       hiddenRollRef.current = idx + 1;
     } else {
-      setMessage('');
+      setMessageKey(null);
+      setMessageText(null);
     }
   }, [selectedMV, db, settings.includeFunny, settings.hidePreview]);
 
@@ -88,7 +96,8 @@ export function Momir() {
 
   const handlePrint = async () => {
     if (!currentCard) return;
-    setMessage('Printing...');
+    setMessageKey('momir.printing');
+    setMessageText(null);
     try {
       const cardData: CardRenderData = {
         name: currentCard.n,
@@ -110,9 +119,11 @@ export function Momir() {
 
       const canvas = renderCardToCanvas(cardData, artImg);
       await print(canvas);
-      setMessage(`Printed: ${currentCard.n}`);
+      setMessageKey(null);
+      setMessageText(`Printed: ${currentCard.n}`);
     } catch (e) {
-      setMessage(`Print failed: ${e instanceof Error ? e.message : 'Unknown error'}`);
+      setMessageKey(null);
+      setMessageText(`Print failed: ${e instanceof Error ? e.message : 'Unknown error'}`);
     }
   };
 
@@ -121,7 +132,7 @@ export function Momir() {
   return (
     <div className={styles.page}>
       <div className={styles.titleRow}>
-        <h2 className={styles.header}>Momir</h2>
+        <h2 className={styles.header}>{t('momir.title')}</h2>
         <FormatInfo
           title="Momir"
           description="Inspired by Momir Vig on MTGO. Discard a card and pay X to create a token copy of a random creature with mana value X. A fun way to discover creatures you’ve never seen!"
@@ -150,7 +161,7 @@ export function Momir() {
             checked={settings.autoPrint}
             onChange={(e) => settingsDispatch({ type: 'SET', key: 'autoPrint', value: e.target.checked })}
           />
-          Auto-print
+          {t('momir.autoprint')}
         </label>
         <label className={styles.toggle}>
           <input
@@ -158,7 +169,7 @@ export function Momir() {
             checked={settings.includeFunny}
             onChange={(e) => settingsDispatch({ type: 'SET', key: 'includeFunny', value: e.target.checked })}
           />
-          Include Un-sets
+          {t('momir.unSets')}
         </label>
         <label className={styles.toggle}>
           <input
@@ -166,7 +177,7 @@ export function Momir() {
             checked={settings.printArt}
             onChange={(e) => settingsDispatch({ type: 'SET', key: 'printArt', value: e.target.checked })}
           />
-          Print Art
+          {t('momir.printArt')}
         </label>
         <label className={styles.toggle}>
           <input
@@ -174,7 +185,7 @@ export function Momir() {
             checked={settings.hidePreview}
             onChange={(e) => settingsDispatch({ type: 'SET', key: 'hidePreview', value: e.target.checked })}
           />
-          Hide Preview
+          {t('momir.hidePreview')}
         </label>
       </div>
 
@@ -184,18 +195,18 @@ export function Momir() {
           onClick={roll}
           disabled={selectedMV === null || !db}
         >
-          Roll
+          {t('momir.roll')}
         </button>
         <button
           className={styles.btnPrint}
           onClick={handlePrint}
           disabled={!currentCard || status !== 'ready'}
         >
-          Print
+          {t('momir.print')}
         </button>
       </div>
 
-      <div className={styles.message}>{message}</div>
+      <div className={styles.message}>{messageKey ? t(messageKey) : messageText}</div>
 
       <div className={styles.cardArea}>
         {/* Card back layer */}
@@ -204,7 +215,7 @@ export function Momir() {
           data-layer="back"
           data-visible={phase !== 'ready' || settings.hidePreview}
           src={`${import.meta.env.BASE_URL}card-back.jpg`}
-          alt="Card back"
+          alt={t('common.cardBack')}
         />
 
         {/* Card face layer — hidden until image loads */}

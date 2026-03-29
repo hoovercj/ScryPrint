@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { usePrinter } from '../hooks/usePrinter.ts';
 import { useSettings, useSettingsDispatch } from '../context/SettingsContext.tsx';
+import { useLocale } from '../hooks/useLocale.ts';
 import { getRandomCard, searchCards, getImageUri, fetchCardArt, type ScryfallCard } from '../lib/scryfall.ts';
 import { renderCardToCanvas } from '../lib/printer/thermalRenderer.ts';
 import { FormatInfo } from '../components/FormatInfo.tsx';
@@ -23,6 +24,7 @@ export function Archenemy() {
   const { status, print } = usePrinter();
   const settings = useSettings();
   const settingsDispatch = useSettingsDispatch();
+  const { t } = useLocale();
 
   // Tab
   const [activeTab, setActiveTab] = useState<Tab>('play');
@@ -178,7 +180,7 @@ export function Archenemy() {
 
   // === Print ===
   const handlePrintCard = async (card: ScryfallCard) => {
-    setMessage('Printing...');
+    setMessage(t('archenemy.printing'));
     try {
       let artImg: ImageBitmap | null = null;
       if (settings.printArt) {
@@ -326,10 +328,10 @@ export function Archenemy() {
       {isAllSets && (
         <div className={styles.collapseControls}>
           <button className={styles.collapseBtn} onClick={() => settingsDispatch({ type: 'SET', key: 'archenemyCollapsedSets', value: [] })}>
-            Expand All
+            {t('archenemy.expandAll')}
           </button>
           <button className={styles.collapseBtn} onClick={() => settingsDispatch({ type: 'SET', key: 'archenemyCollapsedSets', value: groupedCards.map(([name]) => name) })}>
-            Collapse All
+            {t('archenemy.collapseAll')}
           </button>
         </div>
       )}
@@ -353,7 +355,7 @@ export function Archenemy() {
   return (
     <div className={styles.page}>
       <div className={styles.titleRow}>
-        <h2 className={styles.header}>Archenemy</h2>
+        <h2 className={styles.header}>{t('archenemy.title')}</h2>
         <FormatInfo
           title="Archenemy"
           description="One player is the Archenemy with a scheme deck (20+ cards, max 2 copies each), battling a team of opponents. At the start of each main phase, the Archenemy sets a scheme in motion by revealing the top card."
@@ -367,13 +369,13 @@ export function Archenemy() {
           className={`${styles.tab} ${activeTab === 'play' ? styles.tabActive : ''}`}
           onClick={() => setActiveTab('play')}
         >
-          Play
+          {t('archenemy.play')}
         </button>
         <button
           className={`${styles.tab} ${activeTab === 'build' ? styles.tabActive : ''}`}
           onClick={() => setActiveTab('build')}
         >
-          Deck{deck.deckSize > 0 ? ` (${deck.deckSize})` : ''}
+          {t('archenemy.deck')}{deck.deckSize > 0 ? ` (${deck.deckSize})` : ''}
         </button>
       </div>
 
@@ -384,19 +386,19 @@ export function Archenemy() {
             /* --- Deck Play Mode --- */
             <>
               <div className={styles.deckProgress}>
-                <span className={styles.deckProgressCount}>{deck.drawIndex} / {deck.deckSize}</span> drawn
+                <span className={styles.deckProgressCount}>{deck.drawIndex} / {deck.deckSize}</span> {t('archenemy.drawn')}
               </div>
 
               <div className={styles.actions}>
                 <button className={styles.btnNext} onClick={handleDeckDraw} disabled={deck.isExhausted}>
-                  {deck.isExhausted ? 'Deck Empty' : 'Set Scheme in Motion'}
+                  {deck.isExhausted ? t('archenemy.deckEmpty') : t('archenemy.setScheme')}
                 </button>
                 <button className={styles.btnPrint} onClick={handlePrint} disabled={!displayCard || status !== 'ready'}>
-                  Print
+                  {t('archenemy.print')}
                 </button>
                 <label className={styles.toggle}>
                   <input type="checkbox" checked={settings.autoPrint} onChange={(e) => settingsDispatch({ type: 'SET', key: 'autoPrint', value: e.target.checked })} />
-                  Auto-print
+                  {t('archenemy.autoprint')}
                 </label>
               </div>
 
@@ -427,13 +429,13 @@ export function Archenemy() {
 
               {deck.isExhausted && (
                 <div className={styles.deckExhausted}>
-                  All schemes have been set in motion!
+                  {t('archenemy.exhausted')}
                 </div>
               )}
 
               <div className={styles.deckActions}>
-                <button className={styles.btnSmall} onClick={handleReshuffle}>Reshuffle</button>
-                <button className={styles.btnSmall} onClick={handleEndGame}>End Game</button>
+                <button className={styles.btnSmall} onClick={handleReshuffle}>{t('archenemy.reshuffle')}</button>
+                <button className={styles.btnSmall} onClick={handleEndGame}>{t('archenemy.endGame')}</button>
               </div>
 
               {/* Played cards */}
@@ -441,7 +443,7 @@ export function Archenemy() {
                 <div className={styles.playedSection}>
                   <button className={styles.playedToggle} onClick={() => setShowPlayed(!showPlayed)}>
                     <span className={styles.chevron} data-collapsed={!showPlayed}>▸</span>
-                    Played ({deck.played.length})
+                    {t('archenemy.played')} ({deck.played.length})
                   </button>
                   {showPlayed && (
                     <div className={styles.playedGrid}>
@@ -463,14 +465,14 @@ export function Archenemy() {
             <>
               <div className={styles.actions}>
                 <button className={styles.btnNext} onClick={nextScheme} disabled={loadingNext}>
-                  {loadingNext ? 'Loading...' : 'Set Scheme in Motion'}
+                  {loadingNext ? t('archenemy.loading') : t('archenemy.setScheme')}
                 </button>
                 <button className={styles.btnPrint} onClick={handlePrint} disabled={!displayCard || status !== 'ready'}>
-                  Print
+                  {t('archenemy.print')}
                 </button>
                 <label className={styles.toggle}>
                   <input type="checkbox" checked={settings.autoPrint} onChange={(e) => settingsDispatch({ type: 'SET', key: 'autoPrint', value: e.target.checked })} />
-                  Auto-print
+                  {t('archenemy.autoprint')}
                 </label>
               </div>
 
@@ -487,7 +489,7 @@ export function Archenemy() {
                 </select>
                 <label className={styles.toggle}>
                   <input type="checkbox" checked={showAll} onChange={handleShowAll} disabled={loadingAll} />
-                  Show All Cards
+                  {t('archenemy.showAll')}
                 </label>
               </div>
 
@@ -557,18 +559,18 @@ export function Archenemy() {
             </select>
             <div className={styles.deckQuickActions}>
               <button className={styles.linkBtn} onClick={buildForMe} disabled={allCards.length === 0}>
-                Build for me
+                {t('archenemy.buildForMe')}
               </button>
               <button className={styles.linkBtn} onClick={() => deck.addAll(allCards)} disabled={allCards.length === 0}>
-                Add All
+                {t('archenemy.addAll')}
               </button>
               <button className={styles.linkBtn} onClick={deck.clearDeck} disabled={deck.deckSize === 0}>
-                Clear
+                {t('archenemy.clear')}
               </button>
             </div>
           </div>
 
-          {loadingAll && <div className={styles.message}>Loading cards…</div>}
+          {loadingAll && <div className={styles.message}>{t('archenemy.loadingCards')}</div>}
 
           {groupedCards.length > 0 && renderGroupedGrid(true)}
         </>
@@ -606,11 +608,11 @@ export function Archenemy() {
               <div className={styles.detailActions}>
                 {!deck.isPlaying && (
                   <button className={styles.btnNext} onClick={() => setSchemeFromDetail(selectedCard)}>
-                    Set This Scheme
+                    {t('archenemy.setThis')}
                   </button>
                 )}
                 <button className={styles.btnPrint} onClick={() => handlePrintCard(selectedCard)} disabled={status !== 'ready'}>
-                  Print
+                  {t('archenemy.print')}
                 </button>
               </div>
               <div className={styles.detailDeckRow}>
@@ -638,16 +640,16 @@ export function Archenemy() {
         <div className={styles.dialogOverlay} onClick={() => setShowInvalidDialog(false)}>
           <div className={styles.dialog} onClick={(e) => e.stopPropagation()}>
             <button className={styles.dialogClose} onClick={() => setShowInvalidDialog(false)} aria-label="Close">&times;</button>
-            <div className={styles.dialogTitle}>Deck is Invalid</div>
+            <div className={styles.dialogTitle}>{t('archenemy.invalidDeck')}</div>
             <div className={styles.dialogBody}>
               {!deck.isLegal && <p>Need at least {deck.minDeckSize} cards (currently {deck.deckSize}).</p>}
             </div>
             <div className={styles.dialogActions}>
               <button className={styles.btnNext} onClick={() => { setShowInvalidDialog(false); handleStartDeck(); }}>
-                Play Anyway
+                {t('archenemy.playAnyway')}
               </button>
               <button className={styles.btnSmall} onClick={() => { setShowInvalidDialog(false); setActiveTab('build'); }}>
-                Edit Deck
+                {t('archenemy.editDeck')}
               </button>
             </div>
           </div>
