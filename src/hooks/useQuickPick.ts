@@ -19,7 +19,22 @@ export interface QuickPickCard {
 function loadStarred(): QuickPickCard[] {
   try {
     const raw = localStorage.getItem(STARRED_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed: QuickPickCard[] = JSON.parse(raw);
+      // Sync default cards with current definitions (migrates old query → scryfallId, etc.)
+      const defaultsByName = new Map(DEFAULT_STARRED.map(d => [d.name, d]));
+      let migrated = false;
+      const result = parsed.map(card => {
+        if (!card.id.startsWith('default_')) return card;
+        const def = defaultsByName.get(card.name);
+        if (!def) return card;
+        if (card.query === def.query && card.scryfallId === def.scryfallId && card.faceIndex === def.faceIndex) return card;
+        migrated = true;
+        return { ...card, query: def.query, scryfallId: def.scryfallId, faceIndex: def.faceIndex };
+      });
+      if (migrated) localStorage.setItem(STARRED_KEY, JSON.stringify(result));
+      return result;
+    }
   } catch { /* ignore */ }
 
   // Seed from defaults on first load
