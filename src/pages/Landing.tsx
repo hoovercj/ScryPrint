@@ -22,7 +22,7 @@ const MODES = [
   },
   {
     to: '/browse',
-    iconClass: 'ms ms-token',
+    iconClass: 'ms ms-ability-investigate',
     name: 'Browse & Print',
     desc: 'Find any card, token, or emblem and print it',
   },
@@ -33,7 +33,7 @@ export function Landing() {
     <div className={styles.page}>
       <h1 className={styles.title}>ScryPrint</h1>
       <p className={styles.subtitle}>
-        MTG cards on thermal paper. Connect your printer and pick a mode.
+        What are you playing today?
       </p>
       <div className={styles.modes}>
         {MODES.map((mode) => (
