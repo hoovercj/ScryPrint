@@ -232,23 +232,44 @@
   background: rgba(0, 0, 0, 0.7);
   z-index: 200;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
 }
 
 .detailPanel {
   background: var(--bg-secondary);
-  border-top-left-radius: var(--radius-lg);
-  border-top-right-radius: var(--radius-lg);
+  border-radius: var(--radius-lg);
   padding: 20px 16px 32px;
   width: 100%;
   max-width: 500px;
-  max-height: 85dvh;
+  max-height: 95dvh;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 16px;
+  scrollbar-gutter: stable;
+}
+
+.detailPanel::-webkit-scrollbar {
+  width: 6px;
+  background: transparent;
+}
+
+.detailPanel::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+
+.detailPanel::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+@supports (scrollbar-width: thin) {
+  .detailPanel {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+  }
 }
 
 .detailClose {
