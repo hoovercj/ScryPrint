@@ -128,8 +128,19 @@
   text-decoration: none;
   display: flex;
   align-items: center;
+  gap: 6px;
   border-bottom: 2px solid transparent;
   transition: all 0.15s;
+}
+
+.modeTabLabel {
+  display: none;
+}
+
+@media (min-width: 540px) {
+  .modeTabLabel {
+    display: inline;
+  }
 }
 
 .modeTab:hover {
@@ -144,7 +155,6 @@
 
 @media (max-width: 400px) {
   .modeTab {
-    padding: 0 8px;
-    font-size: 12px;
+    padding: 0 10px;
   }
 }

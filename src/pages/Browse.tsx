@@ -270,7 +270,7 @@ export function Browse() {
   const hasFilterResults = fullQuery.length > 0 && !isKeywordMode;
   const showSearchResults = hasFilterResults;
   const showKeywordResults = isKeywordMode;
-  const showStarred = !isKeywordMode && filteredStarred.length > 0;
+  const showStarred = !isKeywordMode && !hasSearch && filteredStarred.length > 0;
 
   useEffect(() => {
     const el = keywordListRef.current;

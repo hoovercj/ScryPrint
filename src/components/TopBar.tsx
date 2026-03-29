@@ -5,10 +5,10 @@ import { InfoPanel } from './InfoPanel.tsx';
 import styles from './TopBar.module.css';
 
 const MODES = [
-  { path: '/momir', label: 'Momir' },
-  { path: '/planechase', label: 'Planechase' },
-  { path: '/archenemy', label: 'Archenemy' },
-  { path: '/browse', label: 'Browse' },
+  { path: '/momir', label: 'Momir', icon: 'ms ms-creature' },
+  { path: '/planechase', label: 'Planechase', icon: 'ms ms-planeswalker' },
+  { path: '/archenemy', label: 'Archenemy', icon: 'ms ms-scheme' },
+  { path: '/browse', label: 'Browse', icon: 'ms ms-ability-investigate' },
 ] as const;
 
 export function TopBar() {
@@ -51,7 +51,8 @@ export function TopBar() {
                 className={styles.modeTab}
                 data-active={location.pathname === m.path}
               >
-                {m.label}
+                <i className={m.icon} />
+                <span className={styles.modeTabLabel}>{m.label}</span>
               </Link>
             ))}
           </nav>
