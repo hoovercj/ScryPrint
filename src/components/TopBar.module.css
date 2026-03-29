@@ -40,6 +40,7 @@
   align-items: center;
   gap: 12px;
   height: 52px;
+  margin-left: auto;
 }
 
 .statusDot {
@@ -114,22 +115,19 @@
   color: var(--text-primary);
 }
 
-/* Mode navigation tabs — wraps to second row on narrow screens */
+/* Mode navigation tabs — inline or wrapped row depending on viewport */
 .modeNav {
   display: flex;
   align-items: stretch;
   gap: 0;
-  order: 3;
   height: 52px;
 }
 
-/* When nav wraps, it takes full width as a second row */
-@media (max-width: 539px) {
-  .modeNav {
-    flex-basis: 100%;
-    justify-content: center;
-    border-top: 1px solid var(--border-subtle);
-  }
+/* Wrapped: full-width centered second row */
+.modeNavRow {
+  flex-basis: 100%;
+  justify-content: center;
+  border-top: 1px solid var(--border-subtle);
 }
 
 .modeTab {
@@ -151,6 +149,10 @@
   .modeTabLabel {
     display: none;
   }
+
+  .modeTab {
+    padding: 0 16px;
+  }
 }
 
 .modeTab:hover {
@@ -161,10 +163,4 @@
 .modeTab[data-active='true'] {
   color: var(--accent-blue);
   border-bottom-color: var(--accent-blue);
-}
-
-@media (max-width: 539px) {
-  .modeTab {
-    padding: 0 16px;
-  }
 }

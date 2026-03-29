@@ -11,12 +11,23 @@ const MODES = [
   { path: '/browse', label: 'Browse', icon: 'ms ms-ability-investigate' },
 ] as const;
 
+const NAV_INLINE_QUERY = '(min-width: 768px)';
+
 export function TopBar() {
   const { status, modelName, connect, disconnect } = usePrinter();
   const [infoOpen, setInfoOpen] = useState(false);
   const location = useLocation();
 
   const isModePage = MODES.some(m => m.path === location.pathname);
+
+  // Whether the nav tabs fit inline next to the logo
+  const [navInline, setNavInline] = useState(() => window.matchMedia(NAV_INLINE_QUERY).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(NAV_INLINE_QUERY);
+    const handler = (e: MediaQueryListEvent) => setNavInline(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
 
   // Sync CSS custom property with actual topbar height (handles wrap)
   const topbarRef = useRef<HTMLElement>(null);
@@ -47,6 +58,18 @@ export function TopBar() {
       ? `${modelName} Connected`
       : status.charAt(0).toUpperCase() + status.slice(1);
 
+  const navTabs = MODES.map((m) => (
+    <Link
+      key={m.path}
+      to={m.path}
+      className={styles.modeTab}
+      data-active={location.pathname === m.path}
+    >
+      <i className={m.icon} />
+      <span className={styles.modeTabLabel}>{m.label}</span>
+    </Link>
+  ));
+
   return (
     <>
       <header className={styles.topbar} ref={topbarRef}>
@@ -54,20 +77,8 @@ export function TopBar() {
           <img src={import.meta.env.BASE_URL + 'icon.svg'} alt="" className={styles.brandIcon} />
           ScryPrint
         </Link>
-        {isModePage && (
-          <nav className={styles.modeNav}>
-            {MODES.map((m) => (
-              <Link
-                key={m.path}
-                to={m.path}
-                className={styles.modeTab}
-                data-active={location.pathname === m.path}
-              >
-                <i className={m.icon} />
-                <span className={styles.modeTabLabel}>{m.label}</span>
-              </Link>
-            ))}
-          </nav>
+        {isModePage && navInline && (
+          <nav className={styles.modeNav}>{navTabs}</nav>
         )}
         <div className={styles.right}>
           <div className={styles.statusDot} data-status={status} />
@@ -87,6 +98,9 @@ export function TopBar() {
             ℹ
           </button>
         </div>
+        {isModePage && !navInline && (
+          <nav className={`${styles.modeNav} ${styles.modeNavRow}`}>{navTabs}</nav>
+        )}
       </header>
       <InfoPanel open={infoOpen} onClose={() => setInfoOpen(false)} />
     </>
