@@ -320,6 +320,7 @@
   appearance: auto;
   outline: none;
   transition: border-color 0.15s;
+  min-height: 40px;
 }
 
 .printingsSelect:focus {
@@ -327,10 +328,19 @@
 }
 
 .printingsLoading {
-  text-align: center;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  background: var(--bg-surface);
   font-size: 13px;
-  color: var(--text-muted);
-  padding: 8px 0;
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
 }
 
 /* Print button in detail */

@@ -4,25 +4,25 @@ import styles from './Landing.module.css';
 const MODES = [
   {
     to: '/momir',
-    icon: '🎲',
+    iconClass: 'ms ms-creature',
     name: 'Momir',
     desc: 'Roll a random creature by mana value',
   },
   {
     to: '/planechase',
-    icon: '🌀',
+    iconClass: 'ms ms-planeswalker',
     name: 'Planechase',
     desc: 'Draw a random plane and roll the planar die',
   },
   {
     to: '/archenemy',
-    icon: '👑',
+    iconClass: 'ms ms-scheme',
     name: 'Archenemy',
     desc: 'Set schemes in motion as the Archenemy',
   },
   {
     to: '/browse',
-    icon: '🔍',
+    iconClass: 'ms ms-token',
     name: 'Browse & Print',
     desc: 'Find any card, token, or emblem and print it',
   },
@@ -38,7 +38,7 @@ export function Landing() {
       <div className={styles.modes}>
         {MODES.map((mode) => (
           <Link key={mode.to} to={mode.to} className={styles.modeCard}>
-            <span className={styles.modeIcon}>{mode.icon}</span>
+            <span className={styles.modeIcon}><i className={mode.iconClass} /></span>
             <div className={styles.modeInfo}>
               <div className={styles.modeName}>{mode.name}</div>
               <div className={styles.modeDesc}>{mode.desc}</div>
