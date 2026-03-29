@@ -308,61 +308,29 @@
   width: 100%;
 }
 
-.printingsToggle {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  color: var(--text-secondary);
-  padding: 8px 12px;
-  font-size: 13px;
+.printingsSelect {
   width: 100%;
-  text-align: left;
-  transition: all 0.15s;
-}
-
-.printingsToggle:hover {
-  border-color: var(--border-default);
-  color: var(--text-primary);
-}
-
-.printingsList {
-  margin-top: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.printingItem {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
+  padding: 10px 12px;
   border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
   background: var(--bg-surface);
-  border: 1px solid transparent;
+  color: var(--text-primary);
   font-size: 13px;
-  color: var(--text-secondary);
-  transition: all 0.15s;
+  font-family: var(--font-sans);
+  appearance: auto;
+  outline: none;
+  transition: border-color 0.15s;
 }
 
-.printingItem:hover {
-  border-color: var(--border-default);
-  color: var(--text-primary);
-}
-
-.printingItem[data-selected='true'] {
+.printingsSelect:focus {
   border-color: var(--accent-blue);
-  color: var(--text-primary);
 }
 
-.printingSet {
-  font-weight: 700;
-  flex: 1;
-}
-
-.printingMeta {
-  font-size: 12px;
+.printingsLoading {
+  text-align: center;
+  font-size: 13px;
   color: var(--text-muted);
+  padding: 8px 0;
 }
 
 /* Print button in detail */

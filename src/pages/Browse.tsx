@@ -23,7 +23,7 @@ export function Browse() {
   const [selectedFaceIndex, setSelectedFaceIndex] = useState<number | undefined>(undefined);
   const [selectedKeyword, setSelectedKeyword] = useState<KeywordCounter | null>(null);
   const [printings, setPrintings] = useState<ScryfallCard[]>([]);
-  const [showPrintings, setShowPrintings] = useState(false);
+  const [loadingPrintings, setLoadingPrintings] = useState(false);
   const [activePrinting, setActivePrinting] = useState<ScryfallCard | null>(null);
   const [message, setMessage] = useState('');
   const [includeReminder, setIncludeReminder] = useState(false);
@@ -66,7 +66,7 @@ export function Browse() {
     setSelectedFaceIndex(faceIndex);
     setSelectedKeyword(null);
     setPrintings([]);
-    setShowPrintings(false);
+    setLoadingPrintings(false);
 
     // Check for a preferred printing
     const preferredId = getPreferred(card.name);
@@ -74,10 +74,29 @@ export function Browse() {
       try {
         const preferred = await getCardById(preferredId);
         setActivePrinting(preferred);
-        return;
-      } catch { /* fall through to default */ }
+      } catch {
+        setActivePrinting(card);
+      }
+    } else {
+      setActivePrinting(card);
     }
-    setActivePrinting(card);
+
+    // Auto-load printings in the background
+    if (!card.type_line?.startsWith('Dungeon')) {
+      setLoadingPrintings(true);
+      try {
+        let typeHint = '';
+        const tl = card.type_line ?? '';
+        if (tl.startsWith('Plane ') || tl === 'Plane') typeHint = ' t:plane';
+        else if (tl.startsWith('Phenomenon')) typeHint = ' t:phenomenon';
+        else if (tl.includes('Scheme')) typeHint = ' t:scheme';
+        else if (tl.startsWith('Emblem')) typeHint = ' t:emblem';
+        else if (tl.startsWith('Token')) typeHint = ' t:token';
+        const data = await searchCards(`!"${card.name}"${typeHint}`, 'prints', { rawQuery: true });
+        setPrintings(data.data);
+      } catch { /* silently fail */ }
+      setLoadingPrintings(false);
+    }
   }, [getPreferred]);
 
   const handleSelectKeyword = useCallback((kw: KeywordCounter) => {
@@ -85,32 +104,17 @@ export function Browse() {
     setSelectedCard(null);
     setActivePrinting(null);
     setPrintings([]);
-    setShowPrintings(false);
+    setLoadingPrintings(false);
   }, []);
 
-  const handleLoadPrintings = useCallback(async () => {
-    if (!selectedCard) return;
-    if (showPrintings) {
-      setShowPrintings(false);
-      return;
-    }
-    try {
-      // Add type hint for special card types to avoid name collisions
-      let typeHint = '';
-      const tl = selectedCard.type_line ?? '';
-      if (tl.startsWith('Plane ') || tl === 'Plane') typeHint = ' t:plane';
-      else if (tl.startsWith('Phenomenon')) typeHint = ' t:phenomenon';
-      else if (tl.includes('Scheme')) typeHint = ' t:scheme';
-      else if (tl.startsWith('Emblem')) typeHint = ' t:emblem';
-      else if (tl.startsWith('Token')) typeHint = ' t:token';
-
-      const data = await searchCards(`!"${selectedCard.name}"${typeHint}`, 'prints', { rawQuery: true });
-      setPrintings(data.data);
-      setShowPrintings(true);
-    } catch {
-      setMessage('Failed to load printings');
-    }
-  }, [selectedCard, showPrintings]);
+  const handleSelectPrinting = useCallback((printingId: string) => {
+    const p = printings.find(c => c.id === printingId);
+    if (!p || !selectedCard) return;
+    setActivePrinting(p);
+    setPreferred(selectedCard.name, p.id);
+    const img = getImageUri(p, 'small');
+    if (img) updateImageByName(selectedCard.name, img);
+  }, [printings, selectedCard, setPreferred, updateImageByName]);
 
   const handlePrint = async () => {
     setMessage('Printing...');
@@ -169,7 +173,7 @@ export function Browse() {
     setSelectedKeyword(null);
     setActivePrinting(null);
     setPrintings([]);
-    setShowPrintings(false);
+    setLoadingPrintings(false);
   };
 
   const toggleStar = (card: ScryfallCard, e: React.MouseEvent) => {
@@ -533,35 +537,23 @@ export function Browse() {
                 <div className={styles.detailName}>{displayCard.name}</div>
                 <div className={styles.detailType}>{displayCard.type_line}</div>
 
-                {/* Printings selector (hidden for dungeons) */}
+                {/* Printings dropdown (hidden for dungeons) */}
                 {!displayCard?.type_line?.startsWith('Dungeon') && <div className={styles.printingsSection}>
-                  <button className={styles.printingsToggle} onClick={handleLoadPrintings}>
-                    {showPrintings ? 'Hide printings' : 'Choose a printing...'}
-                  </button>
-                  {showPrintings && printings.length > 0 && (
-                    <div className={styles.printingsList}>
+                  {loadingPrintings ? (
+                    <div className={styles.printingsLoading}>Loading printings…</div>
+                  ) : printings.length > 1 ? (
+                    <select
+                      className={styles.printingsSelect}
+                      value={activePrinting?.id ?? ''}
+                      onChange={(e) => handleSelectPrinting(e.target.value)}
+                    >
                       {printings.map((p) => (
-                        <button
-                          key={p.id}
-                          className={styles.printingItem}
-                          data-selected={activePrinting?.id === p.id}
-                          onClick={() => {
-                            setActivePrinting(p);
-                            if (selectedCard) {
-                              setPreferred(selectedCard.name, p.id);
-                              const img = getImageUri(p, 'small');
-                              if (img) updateImageByName(selectedCard.name, img);
-                            }
-                          }}
-                        >
-                          <span className={styles.printingSet}>{p.set_name}</span>
-                          <span className={styles.printingMeta}>
-                            #{p.collector_number} · {p.artist}
-                          </span>
-                        </button>
+                        <option key={p.id} value={p.id}>
+                          {p.set_name} · #{p.collector_number} · {p.artist}
+                        </option>
                       ))}
-                    </div>
-                  )}
+                    </select>
+                  ) : null}
                 </div>}
               </>
             ) : null}
