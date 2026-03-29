@@ -335,7 +335,7 @@
   background: var(--bg-surface);
   font-size: 13px;
   font-family: var(--font-sans);
-  color: var(--text-primary);
+  color: var(--text-secondary);
   text-align: center;
   display: flex;
   align-items: center;

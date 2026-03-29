@@ -82,11 +82,14 @@ export function Browse() {
     }
 
     // Auto-load printings in the background
-    if (!card.type_line?.startsWith('Dungeon')) {
+    // Skip for dungeons and game markers (Monarch, City's Blessing, Day//Night, etc.)
+    // whose type_line contains "Card" as a standalone type — unsearchable via Scryfall
+    const tl = card.type_line ?? '';
+    const isGameMarker = /(^|\/{2}\s*)Card(\s|$)/i.test(tl);
+    if (!tl.startsWith('Dungeon') && !isGameMarker) {
       setLoadingPrintings(true);
       try {
         let typeHint = '';
-        const tl = card.type_line ?? '';
         if (tl.startsWith('Plane ') || tl === 'Plane') typeHint = ' t:plane';
         else if (tl.startsWith('Phenomenon')) typeHint = ' t:phenomenon';
         else if (tl.includes('Scheme')) typeHint = ' t:scheme';
