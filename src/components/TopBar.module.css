@@ -233,6 +233,10 @@
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+.modeTab i {
+  font-size: 20px;
   border-bottom: 2px solid transparent;
   transition: all 0.15s;
 }
