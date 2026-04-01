@@ -40,6 +40,7 @@ const de: Record<LocaleKey, string> = {
   'browse.conspiracies': 'Verschwörungen',
   'browse.loading': 'Lade Drucke…',
   'browse.print': 'Drucken',
+  'browse.loadFailed': 'Karte konnte nicht geladen werden',
 
   'momir.title': 'Momir',
   'momir.loading': 'Kartendatenbank wird geladen...',
@@ -147,6 +148,9 @@ const de: Record<LocaleKey, string> = {
 
   'common.close': 'Schließen',
   'common.cardBack': 'Kartenrückseite',
+  'common.showAllEnglishPlanes': 'Alle 180+ Karten auf Englisch anzeigen',
+  'common.showAllEnglishSchemes': 'Alle 100+ Karten auf Englisch anzeigen',
+  'common.showingEnglish': 'Alle Karten werden auf Englisch angezeigt',
 };
 
 export default de;

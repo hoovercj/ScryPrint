@@ -3,7 +3,7 @@ import { useSettings, useSettingsDispatch } from '../context/SettingsContext.tsx
 import { usePrinter } from '../hooks/usePrinter.ts';
 import { useLocale } from '../hooks/useLocale.ts';
 import { renderCardToCanvas, type CardRenderData } from '../lib/printer/thermalRenderer.ts';
-import { scryfallImageUrl, fetchCardArt } from '../lib/scryfall.ts';
+import { scryfallImageUrl, fetchCardArt, searchCards, getImageUri, type ScryfallCard } from '../lib/scryfall.ts';
 import { FormatInfo } from '../components/FormatInfo.tsx';
 import styles from './Momir.module.css';
 
@@ -43,6 +43,26 @@ export function Momir() {
   const [messageText, setMessageText] = useState<string | null>(null);
   const [phase, setPhase] = useState<CardPhase>('idle');
   const hiddenRollRef = useRef(0);
+
+  // Localized card data from Scryfall (for non-English languages)
+  const [localizedCard, setLocalizedCard] = useState<ScryfallCard | null>(null);
+
+  // Fetch localized card from Scryfall when creature changes and language is not English
+  useEffect(() => {
+    if (!currentCard || settings.language === 'en') {
+      setLocalizedCard(null);
+      return;
+    }
+    let cancelled = false;
+    searchCards(`!"${currentCard.n}"`, undefined, { lang: settings.language })
+      .then(result => {
+        if (!cancelled && result.data.length > 0) {
+          setLocalizedCard(result.data[0]);
+        }
+      })
+      .catch(() => { /* fall back to English */ });
+    return () => { cancelled = true; };
+  }, [currentCard, settings.language]);
 
   // Load creatures.json
   useEffect(() => {
@@ -100,10 +120,10 @@ export function Momir() {
     setMessageText(null);
     try {
       const cardData: CardRenderData = {
-        name: currentCard.n,
+        name: localizedCard?.printed_name ?? localizedCard?.name ?? currentCard.n,
         manaCost: currentCard.m,
-        typeLine: currentCard.t,
-        oracleText: currentCard.x,
+        typeLine: localizedCard?.printed_type_line ?? localizedCard?.type_line ?? currentCard.t,
+        oracleText: localizedCard?.printed_text ?? localizedCard?.oracle_text ?? currentCard.x,
         power: currentCard.p,
         toughness: currentCard.h,
       };
@@ -111,7 +131,10 @@ export function Momir() {
       let artImg: ImageBitmap | null = null;
       if (settings.printArt) {
         try {
-          artImg = await fetchCardArt(scryfallImageUrl(currentCard.n, 'art_crop'));
+          const artUrl = localizedCard
+            ? (getImageUri(localizedCard, 'art_crop') ?? scryfallImageUrl(currentCard.n, 'art_crop', settings.language))
+            : scryfallImageUrl(currentCard.n, 'art_crop', settings.language);
+          artImg = await fetchCardArt(artUrl);
         } catch {
           // Art fetch failed, print without it
         }
@@ -128,6 +151,14 @@ export function Momir() {
   };
 
   const pt = currentCard?.p && currentCard?.h ? `${currentCard.p} / ${currentCard.h}` : '';
+
+  // Localized display fields — prefer Scryfall card data, fall back to creatures.json
+  const displayName = localizedCard?.printed_name ?? localizedCard?.name ?? currentCard?.n ?? '';
+  const displayType = localizedCard?.printed_type_line ?? localizedCard?.type_line ?? currentCard?.t ?? '';
+  const displayText = localizedCard?.printed_text ?? localizedCard?.oracle_text ?? currentCard?.x ?? '';
+  const displayImageUrl = currentCard
+    ? (localizedCard ? getImageUri(localizedCard) : scryfallImageUrl(currentCard.n, 'normal', settings.language))
+    : null;
 
   return (
     <div className={styles.page}>
@@ -219,14 +250,14 @@ export function Momir() {
         />
 
         {/* Card face layer — hidden until image loads */}
-        {currentCard && !settings.hidePreview && (
+        {currentCard && !settings.hidePreview && displayImageUrl && (
           <img
             className={styles.cardImg}
             data-layer="front"
             data-visible={phase === 'ready'}
-            key={currentCard.n}
-            src={scryfallImageUrl(currentCard.n)}
-            alt={currentCard.n}
+            key={`${currentCard.n}-${settings.language}`}
+            src={displayImageUrl}
+            alt={displayName}
             crossOrigin="anonymous"
             onLoad={() => setPhase('ready')}
             onError={() => setPhase('ready')}
@@ -236,9 +267,9 @@ export function Momir() {
         {/* Card info */}
         {currentCard && !settings.hidePreview && phase === 'ready' && (
           <div className={styles.cardInfo}>
-            <div className={styles.cardName}>{currentCard.n}</div>
-            <div className={styles.cardType}>{currentCard.t}</div>
-            {currentCard.x && <div className={styles.cardText}>{currentCard.x}</div>}
+            <div className={styles.cardName}>{displayName}</div>
+            <div className={styles.cardType}>{displayType}</div>
+            {displayText && <div className={styles.cardText}>{displayText}</div>}
             {pt && <div className={styles.cardPt}>{pt}</div>}
           </div>
         )}

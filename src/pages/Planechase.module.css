@@ -14,6 +14,21 @@
   gap: 6px;
 }
 
+.langToggle {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-style: italic;
+  text-align: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 0;
+  width: 100%;
+}
+.langToggle:hover {
+  text-decoration: underline;
+}
+
 .header {
   font-size: 22px;
   font-weight: 700;

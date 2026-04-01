@@ -40,6 +40,7 @@ const en = {
   'browse.conspiracies': 'Conspiracies',
   'browse.loading': 'Loading printings…',
   'browse.print': 'Print',
+  'browse.loadFailed': 'Failed to load card',
 
   // Momir
   'momir.title': 'Momir',
@@ -153,6 +154,9 @@ const en = {
   // Common
   'common.close': 'Close',
   'common.cardBack': 'Card back',
+  'common.showAllEnglishPlanes': 'Show all 180+ cards in English',
+  'common.showAllEnglishSchemes': 'Show all 100+ cards in English',
+  'common.showingEnglish': 'Showing all cards in English',
 } as const;
 
 export type LocaleKey = keyof typeof en;

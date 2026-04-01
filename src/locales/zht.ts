@@ -40,6 +40,7 @@ const zht: Record<LocaleKey, string> = {
   'browse.conspiracies': '陰謀',
   'browse.loading': '正在載入印刷版本…',
   'browse.print': '列印',
+  'browse.loadFailed': '無法載入卡片',
 
   'momir.title': 'Momir',
   'momir.loading': '正在載入卡牌資料庫...',
@@ -147,6 +148,9 @@ const zht: Record<LocaleKey, string> = {
 
   'common.close': '關閉',
   'common.cardBack': '卡背',
+  'common.showAllEnglishPlanes': '顯示全部180+張英文卡牌',
+  'common.showAllEnglishSchemes': '顯示全部100+張英文卡牌',
+  'common.showingEnglish': '正在顯示所有英文卡牌',
 };
 
 export default zht;

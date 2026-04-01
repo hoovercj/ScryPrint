@@ -2,22 +2,21 @@ export type LangCode = 'en' | 'es' | 'fr' | 'de' | 'it' | 'pt' | 'ja' | 'ko' | '
 
 export interface LangDef {
   code: LangCode;
-  flag: string;
   name: string;
 }
 
 export const LANGUAGES: LangDef[] = [
-  { code: 'en', flag: '🇺🇸', name: 'English' },
-  { code: 'es', flag: '🇪🇸', name: 'Español' },
-  { code: 'fr', flag: '🇫🇷', name: 'Français' },
-  { code: 'de', flag: '🇩🇪', name: 'Deutsch' },
-  { code: 'it', flag: '🇮🇹', name: 'Italiano' },
-  { code: 'pt', flag: '🇧🇷', name: 'Português' },
-  { code: 'ja', flag: '🇯🇵', name: '日本語' },
-  { code: 'ko', flag: '🇰🇷', name: '한국어' },
-  { code: 'ru', flag: '🇷🇺', name: 'Русский' },
-  { code: 'zhs', flag: '🇨🇳', name: '简体中文' },
-  { code: 'zht', flag: '🇹🇼', name: '繁體中文' },
+  { code: 'en', name: 'English' },
+  { code: 'es', name: 'Español' },
+  { code: 'fr', name: 'Français' },
+  { code: 'de', name: 'Deutsch' },
+  { code: 'it', name: 'Italiano' },
+  { code: 'pt', name: 'Português' },
+  { code: 'ja', name: '日本語' },
+  { code: 'ko', name: '한국어' },
+  { code: 'ru', name: 'Русский' },
+  { code: 'zhs', name: '简体中文' },
+  { code: 'zht', name: '繁體中文' },
 ];
 
 export function getLangDef(code: LangCode): LangDef {

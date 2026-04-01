@@ -69,6 +69,10 @@ export function Planechase() {
   const [loadingNext, setLoadingNext] = useState(false);
   const [phase, setPhase] = useState<CardPhase>('idle');
 
+  // Language toggle: default to user's language, with option to show all English cards
+  const [showEnglish, setShowEnglish] = useState(false);
+  const effectiveLang = (settings.language !== 'en' && !showEnglish) ? settings.language : undefined;
+
   // Shared card browsing
   const [allCards, setAllCards] = useState<ScryfallCard[]>([]);
   const [loadingAll, setLoadingAll] = useState(false);
@@ -106,7 +110,7 @@ export function Planechase() {
     setLoadingAll(true);
     try {
       let allResults: ScryfallCard[] = [];
-      let data = await searchCards(buildQuery());
+      let data = await searchCards(buildQuery(), undefined, { lang: effectiveLang });
       allResults = [...data.data];
       while (data.has_more && data.next_page) {
         await new Promise(r => setTimeout(r, 100));
@@ -120,7 +124,7 @@ export function Planechase() {
     } finally {
       setLoadingAll(false);
     }
-  }, [buildQuery]);
+  }, [buildQuery, effectiveLang]);
 
   // Auto-load when Build tab opens
   useEffect(() => {
@@ -149,6 +153,17 @@ export function Planechase() {
     }
   }, [settings.planechaseSetFilter, activeTab, showAll, fetchAllCards]);
 
+  // Re-fetch when language toggle changes
+  const prevLangRef = useRef(effectiveLang);
+  useEffect(() => {
+    if (prevLangRef.current !== effectiveLang) {
+      prevLangRef.current = effectiveLang;
+      if (allCards.length > 0 || activeTab === 'build' || showAll) {
+        fetchAllCards();
+      }
+    }
+  }, [effectiveLang, allCards.length, activeTab, showAll, fetchAllCards]);
+
   // Group cards by set
   const groupedCards = useMemo(() => {
     if (allCards.length === 0) return [];
@@ -167,7 +182,7 @@ export function Planechase() {
     setMessage('');
     setPhase('back');
     try {
-      const card = await getRandomCard(buildQuery());
+      const card = await getRandomCard(buildQuery(), effectiveLang);
       setCurrentPlane(card);
       setDieResult(null);
     } catch (e) {
@@ -176,7 +191,7 @@ export function Planechase() {
     } finally {
       setLoadingNext(false);
     }
-  }, [buildQuery, currentPlane]);
+  }, [buildQuery, currentPlane, effectiveLang]);
 
   const rollDie = useCallback(() => {
     setRolling(true);
@@ -420,6 +435,15 @@ export function Planechase() {
         />
       </div>
 
+      {settings.language !== 'en' && (
+        <button
+          className={styles.langToggle}
+          onClick={() => setShowEnglish(!showEnglish)}
+        >
+          {showEnglish ? t('common.showingEnglish') : t('common.showAllEnglishPlanes')}
+        </button>
+      )}
+
       {/* Tab bar */}
       <div className={styles.tabBar}>
         <button
@@ -554,7 +578,7 @@ export function Planechase() {
                   onChange={(e) => settingsDispatch({ type: 'SET', key: 'planechaseSetFilter', value: e.target.value })}
                 >
                   {PLANECHASE_SETS.map((s) => (
-                    <option key={s.value} value={s.value}>{s.label}</option>
+                    <option key={s.value} value={s.value}>{s.value === '' ? t('planechase.allSets') : s.label}</option>
                   ))}
                 </select>
                 <label className={styles.toggle}>
@@ -638,7 +662,7 @@ export function Planechase() {
               onChange={(e) => settingsDispatch({ type: 'SET', key: 'planechaseSetFilter', value: e.target.value })}
             >
               {PLANECHASE_SETS.map((s) => (
-                <option key={s.value} value={s.value}>{s.label}</option>
+                <option key={s.value} value={s.value}>{s.value === '' ? t('planechase.allSets') : s.label}</option>
               ))}
             </select>
           </div>

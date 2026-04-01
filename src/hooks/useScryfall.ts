@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { searchCards, type ScryfallCard, type ScryfallList } from '../lib/scryfall.ts';
 
-export function useScryfall(query: string, debounceMs = 300) {
+export function useScryfall(query: string, debounceMs = 300, lang?: string) {
   const [results, setResults] = useState<ScryfallCard[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,7 +29,7 @@ export function useScryfall(query: string, debounceMs = 300) {
       abortRef.current = controller;
 
       try {
-        const data: ScryfallList = await searchCards(query);
+        const data: ScryfallList = await searchCards(query, undefined, { lang });
         if (!controller.signal.aborted) {
           setResults(data.data);
           setTotalCards(data.total_cards);
@@ -49,7 +49,7 @@ export function useScryfall(query: string, debounceMs = 300) {
       if (timerRef.current) clearTimeout(timerRef.current);
       abortRef.current?.abort();
     };
-  }, [query, debounceMs]);
+  }, [query, debounceMs, lang]);
 
   const clear = useCallback(() => {
     setResults([]);

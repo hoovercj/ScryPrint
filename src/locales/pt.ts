@@ -40,6 +40,7 @@ const pt: Record<LocaleKey, string> = {
   'browse.conspiracies': 'Conspirações',
   'browse.loading': 'Carregando impressões…',
   'browse.print': 'Imprimir',
+  'browse.loadFailed': 'Falha ao carregar a carta',
 
   'momir.title': 'Momir',
   'momir.loading': 'Carregando banco de dados de cards...',
@@ -146,7 +147,8 @@ const pt: Record<LocaleKey, string> = {
   'info.resetDesc': 'Limpa seus cards favoritos, cards recentes, impressões preferidas e configurações.',
 
   'common.close': 'Fechar',
-  'common.cardBack': 'Verso do card',
-};
+  'common.cardBack': 'Verso do card',  'common.showAllEnglishPlanes': 'Mostrar todos os 180+ cards em inglês',
+  'common.showAllEnglishSchemes': 'Mostrar todos os 100+ cards em inglês',
+  'common.showingEnglish': 'Mostrando todos os cards em inglês',};
 
 export default pt;

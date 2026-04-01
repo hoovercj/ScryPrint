@@ -137,7 +137,7 @@ export function SettingsPanel({ open, onClose }: Props) {
                 onChange={(e) => dispatch({ type: 'SET', key: 'language', value: e.target.value })}
               >
                 {LANGUAGES.map((lang) => (
-                  <option key={lang.code} value={lang.code}>{lang.flag} {lang.name}</option>
+                  <option key={lang.code} value={lang.code}>{lang.code.toUpperCase()} — {lang.name}</option>
                 ))}
               </select>
             </div>

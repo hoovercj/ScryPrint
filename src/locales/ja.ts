@@ -40,6 +40,7 @@ const ja: Record<LocaleKey, string> = {
   'browse.conspiracies': '策略',
   'browse.loading': '印刷版を読み込み中…',
   'browse.print': '印刷',
+  'browse.loadFailed': 'カードの読み込みに失敗しました',
 
   'momir.title': 'モミール',
   'momir.loading': 'カードデータベースを読み込み中...',
@@ -147,6 +148,9 @@ const ja: Record<LocaleKey, string> = {
 
   'common.close': '閉じる',
   'common.cardBack': 'カード裏面',
+  'common.showAllEnglishPlanes': '英語で180枚以上のカードを表示',
+  'common.showAllEnglishSchemes': '英語で100枚以上のカードを表示',
+  'common.showingEnglish': 'すべてのカードを英語で表示中',
 };
 
 export default ja;

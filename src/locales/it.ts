@@ -36,6 +36,7 @@ const it: Record<LocaleKey, string> = {
   'browse.conspiracies': 'Cospirazioni',
   'browse.loading': 'Caricamento stampe…',
   'browse.print': 'Stampa',
+  'browse.loadFailed': 'Impossibile caricare la carta',
 
   'momir.title': 'Momir',
   'momir.loading': 'Caricamento database carte...',
@@ -143,6 +144,9 @@ const it: Record<LocaleKey, string> = {
 
   'common.close': 'Chiudi',
   'common.cardBack': 'Retro della carta',
+  'common.showAllEnglishPlanes': 'Mostra tutte le 180+ carte in inglese',
+  'common.showAllEnglishSchemes': 'Mostra tutte le 100+ carte in inglese',
+  'common.showingEnglish': 'Visualizzazione di tutte le carte in inglese',
 };
 
 export default it;

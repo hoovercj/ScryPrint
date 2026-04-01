@@ -30,7 +30,8 @@ function loadStarred(): QuickPickCard[] {
         if (!def) return card;
         if (card.query === def.query && card.scryfallId === def.scryfallId && card.faceIndex === def.faceIndex) return card;
         migrated = true;
-        return { ...card, query: def.query, scryfallId: def.scryfallId, faceIndex: def.faceIndex };
+        // Clear imageUri so stale thumbnails get re-resolved with the updated query
+        return { ...card, query: def.query, scryfallId: def.scryfallId, faceIndex: def.faceIndex, imageUri: undefined };
       });
       if (migrated) localStorage.setItem(STARRED_KEY, JSON.stringify(result));
       return result;

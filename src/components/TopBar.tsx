@@ -78,8 +78,6 @@ export function TopBar() {
       : status === 'printing' ? t('topbar.printing')
       : t('topbar.ready');
 
-  const currentFlag = LANGUAGES.find(l => l.code === language)?.flag ?? '🇺🇸';
-
   const navTabs = MODES.map((m) => (
     <Link
       key={m.path}
@@ -118,7 +116,11 @@ export function TopBar() {
               onClick={() => setLangOpen(o => !o)}
               aria-label="Language"
             >
-              {currentFlag}
+              <svg className={styles.globeIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+              </svg>
+              <span className={styles.langBtnCode}>{language.toUpperCase()}</span>
             </button>
             {langOpen && (
               <div className={styles.langDropdown}>
@@ -129,7 +131,7 @@ export function TopBar() {
                     data-active={language === lang.code}
                     onClick={() => { dispatch({ type: 'SET', key: 'language', value: lang.code }); setLangOpen(false); }}
                   >
-                    <span className={styles.langFlag}>{lang.flag}</span>
+                    <span className={styles.langCode}>{lang.code.toUpperCase()}</span>
                     <span className={styles.langName}>{lang.name}</span>
                   </button>
                 ))}

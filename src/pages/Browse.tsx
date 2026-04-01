@@ -54,7 +54,11 @@ export function Browse() {
     return parts.join(' ');
   }, [searchQuery, filterQuery, isKeywordMode]);
 
-  const { results: searchResults, loading: searchLoading } = useScryfall(fullQuery);
+  // Tokens, emblems, dungeons, and conspiracies are English-only on Scryfall;
+  // skip the lang parameter for these filters to avoid wasteful 404 → fallback cycles
+  const ENGLISH_ONLY_FILTERS = new Set<TypeFilterLabel>(['Token', 'Emblem', 'Dungeon', 'Conspiracy']);
+  const searchLang = ENGLISH_ONLY_FILTERS.has(activeFilter) ? undefined : settings.language;
+  const { results: searchResults, loading: searchLoading } = useScryfall(fullQuery, 300, searchLang);
 
   // Keyword counters with starred at top
   const filteredKeywords = useMemo(() => {
@@ -84,7 +88,7 @@ export function Browse() {
     const preferredId = getPreferred(card.name);
     if (preferredId && preferredId !== card.id) {
       try {
-        const preferred = await getCardById(preferredId);
+        const preferred = await getCardById(preferredId, settings.language);
         setActivePrinting(preferred);
       } catch {
         setActivePrinting(card);
@@ -112,7 +116,7 @@ export function Browse() {
       } catch { /* silently fail */ }
       setLoadingPrintings(false);
     }
-  }, [getPreferred]);
+  }, [getPreferred, settings.language]);
 
   const handleSelectKeyword = useCallback((kw: KeywordCounter) => {
     setSelectedKeyword(kw);
@@ -401,18 +405,18 @@ export function Browse() {
                       }
                       setMessage('');
                     } catch {
-                      setMessage('Failed to load card');
+                      setMessage(t('browse.loadFailed'));
                     }
                     return;
                   }
                   // Starred card with real Scryfall ID
                   try {
                     setMessage('Loading...');
-                    const fullCard = await getCardById(card.id);
+                    const fullCard = await getCardById(card.id, settings.language);
                     handleSelectCard(fullCard);
                     setMessage('');
                   } catch {
-                    setMessage('Failed to load card');
+                    setMessage(t('browse.loadFailed'));
                   }
                 }}
               >
@@ -490,11 +494,11 @@ export function Browse() {
                   // Fetch full card data by Scryfall ID
                   try {
                     setMessage('Loading...');
-                    const fullCard = await getCardById(card.id);
+                    const fullCard = await getCardById(card.id, settings.language);
                     handleSelectCard(fullCard);
                     setMessage('');
                   } catch {
-                    setMessage('Failed to load card');
+                    setMessage(t('browse.loadFailed'));
                   }
                 }}
               >

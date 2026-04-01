@@ -17,18 +17,18 @@ export interface DefaultCard {
 }
 
 export const DEFAULT_STARRED: DefaultCard[] = [
-  // Tokens (exclude DFCs so we get standalone tokens)
-  { name: 'Treasure', query: 't:token treasure -layout:double_faced_token', type: 'Token' },
-  { name: 'Food', query: 't:token food -layout:double_faced_token', type: 'Token' },
-  { name: 'Clue', query: 't:token clue -layout:double_faced_token', type: 'Token' },
-  { name: 'Soldier', query: 't:token soldier pow=1 tou=1 c=w -layout:double_faced_token', type: 'Token' },
-  { name: 'Goblin', query: 't:token goblin pow=1 tou=1 c=r -layout:double_faced_token', type: 'Token' },
-  { name: 'Zombie', query: 't:token zombie pow=2 tou=2 c=b -layout:double_faced_token', type: 'Token' },
-  { name: 'Saproling', query: 't:token saproling pow=1 tou=1 c=g -layout:double_faced_token', type: 'Token' },
-  { name: 'Spirit', query: 't:token spirit pow=1 tou=1 c=w -layout:double_faced_token', type: 'Token' },
-  { name: 'Beast', query: 't:token beast pow=3 tou=3 c=g -layout:double_faced_token', type: 'Token' },
-  { name: 'Angel', query: 't:token angel pow=4 tou=4 -layout:double_faced_token', type: 'Token' },
-  { name: 'Dragon', query: 't:token dragon pow=5 tou=5 c=r -layout:double_faced_token', type: 'Token' },
+  // Tokens (exact name match, exclude DFCs so we get standalone tokens)
+  { name: 'Treasure', query: 't:token !"Treasure" -layout:double_faced_token', type: 'Token' },
+  { name: 'Food', query: 't:token !"Food" -layout:double_faced_token', type: 'Token' },
+  { name: 'Clue', query: 't:token !"Clue" -layout:double_faced_token', type: 'Token' },
+  { name: 'Soldier', query: 't:token !"Soldier" pow=1 tou=1 c=w -layout:double_faced_token', type: 'Token' },
+  { name: 'Goblin', query: 't:token !"Goblin" pow=1 tou=1 c=r -layout:double_faced_token', type: 'Token' },
+  { name: 'Zombie', query: 't:token !"Zombie" pow=2 tou=2 c=b -layout:double_faced_token', type: 'Token' },
+  { name: 'Saproling', query: 't:token !"Saproling" pow=1 tou=1 c=g -layout:double_faced_token', type: 'Token' },
+  { name: 'Spirit', query: 't:token !"Spirit" pow=1 tou=1 c=w -layout:double_faced_token', type: 'Token' },
+  { name: 'Beast', query: 't:token !"Beast" pow=3 tou=3 c=g -layout:double_faced_token', type: 'Token' },
+  { name: 'Angel', query: 't:token !"Angel" pow=4 tou=4 -layout:double_faced_token', type: 'Token' },
+  { name: 'Dragon', query: 't:token !"Dragon" pow=5 tou=5 c=r -layout:double_faced_token', type: 'Token' },
 
   // Game markers (unsearchable by Scryfall search API — use direct card IDs)
   { name: 'Monarch', scryfallId: 'f629bba8-e2ef-4d1c-8f64-339879289a6d', type: 'Emblem' },

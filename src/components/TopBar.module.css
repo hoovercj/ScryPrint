@@ -122,17 +122,34 @@
 }
 
 .langBtn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: none;
   border: none;
-  font-size: 22px;
   padding: 4px;
-  line-height: 1;
   cursor: pointer;
-  transition: transform 0.15s;
+  color: var(--text-secondary);
+  transition: color 0.15s;
 }
 
 .langBtn:hover {
-  transform: scale(1.15);
+  color: var(--text-primary);
+}
+
+.globeIcon {
+  width: 24px;
+  height: 24px;
+  opacity: 0.35;
+}
+
+.langBtnCode {
+  position: absolute;
+  font-size: 8px;
+  font-weight: 900;
+  color: var(--text-primary);
+  letter-spacing: 0.3px;
 }
 
 .langDropdown {
@@ -163,7 +180,7 @@
   padding: 8px 14px;
   border: none;
   background: none;
-  color: var(--text-secondary);
+  color: var(--text-primary);
   font-size: 14px;
   cursor: pointer;
   transition: background 0.1s;
@@ -180,9 +197,12 @@
   font-weight: 700;
 }
 
-.langFlag {
-  font-size: 18px;
-  line-height: 1;
+.langCode {
+  min-width: 30px;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: right;
+  opacity: 0.6;
 }
 
 .langName {

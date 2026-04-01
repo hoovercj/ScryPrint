@@ -81,41 +81,77 @@ export function getImageUri(card: ScryfallCard, size: 'small' | 'normal' | 'art_
  * Appends game:paper to exclude Alchemy-only cards.
  */
 export async function searchCards(query: string, unique?: 'cards' | 'art' | 'prints', options?: { rawQuery?: boolean; lang?: string }): Promise<ScryfallList> {
-  const fullQuery = options?.rawQuery ? query : `${query} game:paper`;
+  let fullQuery = options?.rawQuery ? query : `${query} game:paper`;
+  if (options?.lang && options.lang !== 'en') fullQuery += ` lang:${options.lang}`;
   const params = new URLSearchParams({ q: fullQuery, format: 'json' });
   if (unique) params.set('unique', unique);
   if (options?.lang && options.lang !== 'en') params.set('include_multilingual', 'true');
-  const resp = await throttledFetch(`${API_BASE}/cards/search?${params}`);
-  return resp.json();
+  try {
+    const resp = await throttledFetch(`${API_BASE}/cards/search?${params}`);
+    return resp.json();
+  } catch {
+    // If localized search failed, retry without lang filter
+    if (options?.lang && options.lang !== 'en') {
+      return searchCards(query, unique, { ...options, lang: undefined });
+    }
+    throw new Error('Search failed');
+  }
 }
 
 /**
  * Get a random card matching a query.
  * Appends game:paper to exclude Alchemy-only cards.
+ * Falls back to English if the localized query returns no results.
  */
 export async function getRandomCard(query: string, lang?: string): Promise<ScryfallCard> {
   const fullQuery = lang && lang !== 'en' ? `${query} game:paper lang:${lang}` : `${query} game:paper`;
   const params = new URLSearchParams({ q: fullQuery, format: 'json' });
-  const resp = await throttledFetch(`${API_BASE}/cards/random?${params}`);
-  return resp.json();
+  try {
+    const resp = await throttledFetch(`${API_BASE}/cards/random?${params}`);
+    return resp.json();
+  } catch {
+    if (lang && lang !== 'en') {
+      return getRandomCard(query);
+    }
+    throw new Error('Random card failed');
+  }
 }
 
 /**
  * Get a specific card by Scryfall ID.
+ * For non-English languages, tries the /cards/{id}/{lang} endpoint first,
+ * then falls back to a name-based search with lang filter,
+ * then falls back to the default English card.
  */
 export async function getCardById(id: string, lang?: string): Promise<ScryfallCard> {
-  const url = lang && lang !== 'en'
-    ? `${API_BASE}/cards/${encodeURIComponent(id)}/${lang}`
-    : `${API_BASE}/cards/${encodeURIComponent(id)}`;
-  const resp = await throttledFetch(url);
+  if (lang && lang !== 'en') {
+    // Try direct localized endpoint first
+    try {
+      const resp = await throttledFetch(`${API_BASE}/cards/${encodeURIComponent(id)}/${lang}`);
+      return resp.json();
+    } catch {
+      // Not available at that endpoint — try name-based search
+    }
+    // Fetch the English card to get its name, then search for a localized version
+    try {
+      const enCard: ScryfallCard = await (await throttledFetch(`${API_BASE}/cards/${encodeURIComponent(id)}`)).json();
+      const localized = await searchCards(`!"${enCard.name}"`, undefined, { lang });
+      if (localized.data.length > 0) return localized.data[0];
+    } catch {
+      // Name-based search also failed — fall through to English
+    }
+  }
+  const resp = await throttledFetch(`${API_BASE}/cards/${encodeURIComponent(id)}`);
   return resp.json();
 }
 
 /**
  * Get card image URL for printing by exact name.
  */
-export function scryfallImageUrl(name: string, version: 'normal' | 'art_crop' = 'normal'): string {
-  return `${API_BASE}/cards/named?exact=${encodeURIComponent(name)}&format=image&version=${version}`;
+export function scryfallImageUrl(name: string, version: 'normal' | 'art_crop' = 'normal', lang?: string): string {
+  const params = new URLSearchParams({ exact: name, format: 'image', version });
+  if (lang && lang !== 'en') params.set('lang', lang);
+  return `${API_BASE}/cards/named?${params}`;
 }
 
 /**

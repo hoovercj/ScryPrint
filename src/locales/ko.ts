@@ -40,6 +40,7 @@ const ko: Record<LocaleKey, string> = {
   'browse.conspiracies': '음모',
   'browse.loading': '인쇄판 로딩 중…',
   'browse.print': '인쇄',
+  'browse.loadFailed': '카드를 불러오지 못했습니다',
 
   'momir.title': 'Momir',
   'momir.loading': '카드 데이터베이스 로딩 중...',
@@ -147,6 +148,9 @@ const ko: Record<LocaleKey, string> = {
 
   'common.close': '닫기',
   'common.cardBack': '카드 뒷면',
+  'common.showAllEnglishPlanes': '영어로 180개 이상의 카드 모두 보기',
+  'common.showAllEnglishSchemes': '영어로 100개 이상의 카드 모두 보기',
+  'common.showingEnglish': '모든 카드를 영어로 표시 중',
 };
 
 export default ko;

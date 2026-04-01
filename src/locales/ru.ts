@@ -40,6 +40,7 @@ const ru: Record<LocaleKey, string> = {
   'browse.conspiracies': 'Заговоры',
   'browse.loading': 'Загрузка изданий…',
   'browse.print': 'Печать',
+  'browse.loadFailed': 'Не удалось загрузить карту',
 
   'momir.title': 'Momir',
   'momir.loading': 'Загрузка базы данных карт...',
@@ -147,6 +148,9 @@ const ru: Record<LocaleKey, string> = {
 
   'common.close': 'Закрыть',
   'common.cardBack': 'Рубашка карты',
+  'common.showAllEnglishPlanes': 'Показать все 180+ карт на английском',
+  'common.showAllEnglishSchemes': 'Показать все 100+ карт на английском',
+  'common.showingEnglish': 'Показаны все карты на английском',
 };
 
 export default ru;
