@@ -126,7 +126,14 @@ async function sendData(data: Uint8Array, profile: PrinterProfile) {
   for (let i = 0; i < data.length; i += chunkSize) {
     const chunk = data.slice(i, i + chunkSize);
     if (useWriteWithoutResponse) {
-      await bleCharacteristic.writeValueWithoutResponse(chunk);
+      try {
+        await bleCharacteristic.writeValueWithoutResponse(chunk);
+      } catch {
+        // Some printers advertise writeWithoutResponse but fail at runtime;
+        // fall back to write-with-response for this and all future writes.
+        useWriteWithoutResponse = false;
+        await bleCharacteristic.writeValue(chunk);
+      }
     } else {
       await bleCharacteristic.writeValue(chunk);
     }
