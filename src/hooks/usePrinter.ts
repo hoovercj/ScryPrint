@@ -1,11 +1,11 @@
-import { useCallback, useRef } from 'react';
-import { usePrinterState, usePrinterDispatch } from '../context/PrinterContext.tsx';
-import { createBLEPrinter, type BLEPrinter } from '../lib/printer/blePrinter.ts';
+import { useCallback } from 'react';
+import { usePrinterState, usePrinterDispatch, usePrinterRef } from '../context/PrinterContext.tsx';
+import { createBLEPrinter } from '../lib/printer/blePrinter.ts';
 
 export function usePrinter() {
   const state = usePrinterState();
   const dispatch = usePrinterDispatch();
-  const printerRef = useRef<BLEPrinter | null>(null);
+  const printerRef = usePrinterRef();
 
   const connect = useCallback(async () => {
     dispatch({ type: 'CONNECTING' });

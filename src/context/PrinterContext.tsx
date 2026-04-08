@@ -1,4 +1,5 @@
-import { createContext, useContext, useReducer, type ReactNode, type Dispatch } from 'react';
+import { createContext, useContext, useReducer, useRef, type ReactNode, type Dispatch, type MutableRefObject } from 'react';
+import type { BLEPrinter } from '../lib/printer/blePrinter.ts';
 
 export type PrinterStatus = 'disconnected' | 'connecting' | 'ready' | 'printing';
 
@@ -47,13 +48,17 @@ function printerReducer(state: PrinterState, action: PrinterAction): PrinterStat
 
 const PrinterStateContext = createContext<PrinterState>(initialState);
 const PrinterDispatchContext = createContext<Dispatch<PrinterAction>>(() => {});
+const PrinterRefContext = createContext<MutableRefObject<BLEPrinter | null>>({ current: null });
 
 export function PrinterProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(printerReducer, initialState);
+  const printerRef = useRef<BLEPrinter | null>(null);
   return (
     <PrinterStateContext.Provider value={state}>
       <PrinterDispatchContext.Provider value={dispatch}>
-        {children}
+        <PrinterRefContext.Provider value={printerRef}>
+          {children}
+        </PrinterRefContext.Provider>
       </PrinterDispatchContext.Provider>
     </PrinterStateContext.Provider>
   );
@@ -65,4 +70,8 @@ export function usePrinterState() {
 
 export function usePrinterDispatch() {
   return useContext(PrinterDispatchContext);
+}
+
+export function usePrinterRef() {
+  return useContext(PrinterRefContext);
 }
